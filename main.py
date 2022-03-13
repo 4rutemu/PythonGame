@@ -26,4 +26,6 @@ while running:
         # check for closing window
         if event.type == pygame.QUIT:
             running = False
+    screen.fill(BLACK)
+    pygame.display.flip()
 pygame.quit()
