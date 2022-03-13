@@ -1,4 +1,5 @@
 import pygame
+import keyboard
 import random
 
 WIDTH = 360
@@ -21,9 +22,16 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
 
     def update(self):
-        self.rect.x += 5
+
+        if keyboard.is_pressed("d"):
+            self.rect.x += 5
+        if keyboard.is_pressed("a"):
+            self.rect.x -= 5
+
         if self.rect.left > WIDTH:
             self.rect.right = 0
+        if self.rect.right < 0:
+            self.rect.left = WIDTH
 
 # Создаем игру и окно
 pygame.init()
