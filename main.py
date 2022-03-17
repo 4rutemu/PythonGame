@@ -13,7 +13,13 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-class Player(pygame.sprite.Sprite):
+
+class Game_Object(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+
+class Player(Game_Object):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 50))
@@ -32,6 +38,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = 0
         if self.rect.right < 0:
             self.rect.left = WIDTH
+
 
 # Создаем игру и окно
 pygame.init()
