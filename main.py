@@ -13,12 +13,12 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-# Задаём параметры платформ, по которым будет ходить персонаж
 PLATFORM_WIDTH = 30
 PLATFORM_HEIGHT = 30
 PLATFORM_COLOUR = WHITE
 
 #Создаём уровень. По-хорошему, надо перенести в отдельный файлик с уровнями
+platforms = [] #Массив платформ
 FIRST_LVL = [
     "                            ",
     "                            ",
@@ -41,13 +41,16 @@ FIRST_LVL = [
     "                            ",
     "----------------------------"]
 
-class Game_Object(pygame.sprite.Sprite):
+
+class GameObject(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
 # Создадим двухмерный массив для первого уровня
 # В будущем будет отдельный файл для уровней
-class Platforms(Game_Object):
+
+
+class Platforms(GameObject):
     def draw_lvl(self, LVL, WIDTH, HEIGHT, COLOUR):
         x = y = 0  # координаты
         for row in LVL:  # вся строка
@@ -57,26 +60,50 @@ class Platforms(Game_Object):
                     pf = pygame.Surface((WIDTH, HEIGHT))
                     pf.fill(COLOUR)
                     screen.blit(pf, (x, y))
+                    platforms.append(pf) #Заносим платформу в массив для последующей проверки пересечений
 
                 x += WIDTH  # блоки платформы ставятся на ширине блоков
             y += HEIGHT  # то же самое и с высотой
             x = 0  # на каждой новой строчке начинаем с нуля
 
 # Надо бы перенести в отдельный файл Игрока и Game_Object
-class Player(Game_Object):
+
+
+GRAVITY = 0.35
+J_POWER = 10
+
+
+class Player(GameObject):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((30, 30))
         self.image.fill(GREEN)
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        self.yvel = 0
+        self.onGround = False
+
 
     def update(self):
+        self.rect.y += self.yvel
+        self.onGround = False
 
         if keyboard.is_pressed("d"):
             self.rect.x += 10
+
         if keyboard.is_pressed("a"):
             self.rect.x -= 10
+
+        if keyboard.is_pressed("w"):
+            self.onGround = True
+            if self.onGround:
+                self.yvel = -J_POWER
+
+        if keyboard.is_pressed("s"):
+            self.onGround = False
+
+        if not self.onGround:
+            self.yvel += GRAVITY
 
         if self.rect.left > WIDTH:
             self.rect.right = 0
