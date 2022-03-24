@@ -17,8 +17,8 @@ PLATFORM_WIDTH = 30
 PLATFORM_HEIGHT = 30
 PLATFORM_COLOUR = WHITE
 
-#Создаём уровень. По-хорошему, надо перенести в отдельный файлик с уровнями
-platforms = [] #Массив платформ
+# Создаём уровень. По-хорошему, надо перенести в отдельный файлик с уровнями
+platforms = []  # Массив платформ
 FIRST_LVL = [
     "                            ",
     "                            ",
@@ -46,25 +46,33 @@ class GameObject(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
+
 # Создадим двухмерный массив для первого уровня
 # В будущем будет отдельный файл для уровней
 
 
-class Platforms(GameObject):
-    def draw_lvl(self, LVL, WIDTH, HEIGHT, COLOUR):
-        x = y = 0  # координаты
-        for row in LVL:  # вся строка
-            for col in row:  # каждый символ
-                if col == "-":
-                    # создаем блок, заливаем его цветом и рисеум его
-                    pf = pygame.Surface((WIDTH, HEIGHT))
-                    pf.fill(COLOUR)
-                    screen.blit(pf, (x, y))
-                    platforms.append(pf) #Заносим платформу в массив для последующей проверки пересечений
+def draw_lvl(LVL):
+    x = y = 0  # координаты
+    for row in LVL:  # вся строка
+        for col in row:  # каждый символ
+            if col == "-":
+                pf = Platforms(x, y)
+                all_sprites.add(pf)
+                platforms.append(pf)
+                # Заносим платформу в массив для последующей проверки пересечений
 
-                x += WIDTH  # блоки платформы ставятся на ширине блоков
-            y += HEIGHT  # то же самое и с высотой
-            x = 0  # на каждой новой строчке начинаем с нуля
+            x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
+        y += PLATFORM_HEIGHT  # то же самое и с высотой
+        x = 0  # на каждой новой строчке начинаем с нуля
+
+
+class Platforms(GameObject):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
+        self.image.fill(WHITE)
+        self.rect = pygame.Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
+
 
 # Надо бы перенести в отдельный файл Игрока и Game_Object
 
@@ -82,7 +90,6 @@ class Player(GameObject):
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
         self.yvel = 0
         self.onGround = False
-
 
     def update(self):
         self.rect.y += self.yvel
@@ -119,7 +126,8 @@ pygame.display.set_caption("platformer")
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 player = Player()
-platform = Platforms()
+
+draw_lvl(FIRST_LVL)
 all_sprites.add(player)
 
 # Цикл игры
@@ -137,7 +145,7 @@ while running:
 
     # Отрисовка
     screen.fill(BLACK)
-    platform.draw_lvl(FIRST_LVL, PLATFORM_WIDTH, PLATFORM_HEIGHT, WHITE)
+
     all_sprites.draw(screen)
     pygame.display.flip()
 pygame.quit()
