@@ -134,6 +134,10 @@ class Player(GameObject):
 
     def update(self):
         self.get_input(platforms)
+        if self.rect.left > WIDTH:
+            self.rect.right = 0
+        if self.rect.right < 0:
+            self.rect.left = WIDTH
 
 
 # Создаем игру и окно
