@@ -2,6 +2,8 @@ import pygame
 import keyboard
 import random
 
+from pygame import sprite
+
 WIDTH = 800
 HEIGHT = 600
 FPS = 30
@@ -47,9 +49,7 @@ class GameObject(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
 
-# Создадим двухмерный массив для первого уровня
 # В будущем будет отдельный файл для уровней
-
 
 def draw_lvl(LVL):
     x = y = 0  # координаты
@@ -75,10 +75,9 @@ class Platforms(GameObject):
 
 
 # Надо бы перенести в отдельный файл Игрока и Game_Object
-
-
 GRAVITY = 0.35
 J_POWER = 10
+MOVE_SPEED = 7
 
 
 class Player(GameObject):
@@ -89,33 +88,52 @@ class Player(GameObject):
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
         self.yvel = 0
-        self.onGround = False
+        self.xvel = 0
+        self.onGround = True
 
-    def update(self):
-        self.rect.y += self.yvel
-        self.onGround = False
+    def get_input(self, platforms):
+        keys = pygame.key.get_pressed()
 
-        if keyboard.is_pressed("d"):
-            self.rect.x += 10
-
-        if keyboard.is_pressed("a"):
-            self.rect.x -= 10
-
-        if keyboard.is_pressed("w"):
-            self.onGround = True
+        if keys[pygame.K_w]:
             if self.onGround:
                 self.yvel = -J_POWER
-
-        if keyboard.is_pressed("s"):
-            self.onGround = False
-
+        if keys[pygame.K_d]:
+            self.xvel = MOVE_SPEED
+        if keys[pygame.K_a]:
+            self.xvel = -MOVE_SPEED
+        if not(keys[pygame.K_d] or keys[pygame.K_a]):
+            self.xvel = 0
         if not self.onGround:
             self.yvel += GRAVITY
 
-        if self.rect.left > WIDTH:
-            self.rect.right = 0
-        if self.rect.right < 0:
-            self.rect.left = WIDTH
+        self.onGround = False  # Мы не знаем, когда мы на земле((
+        self.rect.y += self.yvel
+        self.collide(0, self.yvel, platforms)
+
+        self.rect.x += self.xvel
+        self.collide(self.xvel, 0, platforms)
+
+    def collide(self, xvel, yvel, platforms):
+        for p in platforms:
+            if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
+
+                if xvel > 0:  # если движется вправо
+                    self.rect.right = p.rect.left  # то не движется вправо
+
+                if xvel < 0:  # если движется влево
+                    self.rect.left = p.rect.right  # то не движется влево
+
+                if yvel > 0:  # если падает вниз
+                    self.rect.bottom = p.rect.top  # то не падает вниз
+                    self.onGround = True  # и становится на что-то твердое
+                    self.yvel = 0  # и энергия падения пропадает
+
+                if yvel < 0:  # если движется вверх
+                    self.rect.top = p.rect.bottom  # то не движется вверх
+                    self.yvel = 0  # и энергия прыжка пропадает
+
+    def update(self):
+        self.get_input(platforms)
 
 
 # Создаем игру и окно
