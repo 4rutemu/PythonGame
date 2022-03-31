@@ -78,6 +78,30 @@ class Platforms(GameObject):
 GRAVITY = 0.35
 J_POWER = 10
 MOVE_SPEED = 7
+ATTACK_TIME = 200
+ATTACK_WIDTH = 10
+ATTACK_HEIGHT = 30
+
+
+class AttackSprite(GameObject):
+    def __init__(self, looking_right):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        if looking_right:
+            self.rect.left = player.rect.right
+            self.rect.top = player.rect.top
+            self.creation_time = pygame.time.get_ticks()
+        if not looking_right:
+            self.rect.right = player.rect.left
+            self.rect.top = player.rect.top
+            self.creation_time = pygame.time.get_ticks()
+
+    def update(self):
+        if (pygame.time.get_ticks() - self.creation_time) > ATTACK_TIME:
+            self.kill()
+            player.is_attacking = False
 
 
 class Player(GameObject):
@@ -90,6 +114,8 @@ class Player(GameObject):
         self.yvel = 0
         self.xvel = 0
         self.onGround = True
+        self.looking_right = True
+        self.is_attacking = False
 
     def get_input(self, platforms):
         keys = pygame.key.get_pressed()
@@ -99,12 +125,18 @@ class Player(GameObject):
                 self.yvel = -J_POWER
         if keys[pygame.K_d]:
             self.xvel = MOVE_SPEED
+            self.looking_right = True
         if keys[pygame.K_a]:
             self.xvel = -MOVE_SPEED
-        if not(keys[pygame.K_d] or keys[pygame.K_a]):
+            self.looking_right = False
+        if not (keys[pygame.K_d] or keys[pygame.K_a]):
             self.xvel = 0
         if not self.onGround:
             self.yvel += GRAVITY
+        if keys[pygame.K_SPACE] and not self.is_attacking:
+            attack = AttackSprite(self.looking_right)
+            all_sprites.add(attack)
+            self.is_attacking = True
 
         self.onGround = False  # Мы не знаем, когда мы на земле((
         self.rect.y += self.yvel
