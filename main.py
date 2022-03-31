@@ -14,6 +14,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
 
 PLATFORM_WIDTH = 30
 PLATFORM_HEIGHT = 30
@@ -28,7 +29,7 @@ FIRST_LVL = [
     "                            ",
     "             --             ",
     "                            ",
-    "                            ",
+    "  e                         ",
     "-----   -----               ",
     "                    ---     ",
     "                            ",
@@ -37,8 +38,8 @@ FIRST_LVL = [
     "                            ",
     "---------------             ",
     "                            ",
-    "                      ------",
-    "                ------------",
+    "                    e ------",
+    "    e           ------------",
     "                            ",
     "                            ",
     "----------------------------"]
@@ -60,6 +61,10 @@ def draw_lvl(LVL):
                 all_sprites.add(pf)
                 platforms.append(pf)
                 # Заносим платформу в массив для последующей проверки пересечений
+
+            if col == "e":
+                enemy = Enemy(x, y)
+                all_sprites.add(enemy)
 
             x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
         y += PLATFORM_HEIGHT  # то же самое и с высотой
@@ -170,6 +175,16 @@ class Player(GameObject):
             self.rect.right = 0
         if self.rect.right < 0:
             self.rect.left = WIDTH
+
+
+#TODO: Сделать врагам физику, коллизии, получение урона от атак
+class Enemy(GameObject):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.onGround = False
+        self.image = pygame.Surface((30, 30))
+        self.image.fill(YELLOW)
+        self.rect = pygame.Rect(x, y, 30, 30)
 
 
 # Создаем игру и окно
