@@ -20,15 +20,15 @@ PLATFORM_WIDTH = 30
 PLATFORM_HEIGHT = 30
 PLATFORM_COLOUR = WHITE
 
-# Создаём уровень. По-хорошему, надо перенести в отдельный файлик с уровнями
 platforms = []  # Массив платформ
+enemys = []
 FIRST_LVL = [
     "                            ",
     "                            ",
     "                            ",
     "                            ",
     "             --             ",
-    "                            ",
+    "          e                  ",
     "  e                         ",
     "-----   -----               ",
     "                    ---     ",
@@ -65,6 +65,7 @@ def draw_lvl(LVL):
             if col == "e":
                 enemy = Enemy(x, y)
                 all_sprites.add(enemy)
+                enemys.append(enemy)
 
             x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
         y += PLATFORM_HEIGHT  # то же самое и с высотой
@@ -89,7 +90,7 @@ ATTACK_HEIGHT = 30
 
 
 class AttackSprite(GameObject):
-    def __init__(self, looking_right):
+    def __init__(self, looking_right, looking_down):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
         self.image.fill(RED)
@@ -102,6 +103,8 @@ class AttackSprite(GameObject):
             self.rect.right = player.rect.left
             self.rect.top = player.rect.top
             self.creation_time = pygame.time.get_ticks()
+        if looking_down: #Для удара снизу
+            pass
 
     def update(self):
         if (pygame.time.get_ticks() - self.creation_time) > ATTACK_TIME:
@@ -120,9 +123,10 @@ class Player(GameObject):
         self.xvel = 0
         self.onGround = True
         self.looking_right = True
+        self.looking_down = False
         self.is_attacking = False
 
-    def get_input(self, platforms):
+    def get_input(self, platforms, enemys):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_w]:
@@ -134,23 +138,25 @@ class Player(GameObject):
         if keys[pygame.K_a]:
             self.xvel = -MOVE_SPEED
             self.looking_right = False
+        if keys[pygame.K_s]:
+            self.looking_down = True
         if not (keys[pygame.K_d] or keys[pygame.K_a]):
             self.xvel = 0
         if not self.onGround:
             self.yvel += GRAVITY
         if keys[pygame.K_SPACE] and not self.is_attacking:
-            attack = AttackSprite(self.looking_right)
+            attack = AttackSprite(self.looking_right, self.looking_down)
             all_sprites.add(attack)
             self.is_attacking = True
 
         self.onGround = False  # Мы не знаем, когда мы на земле((
         self.rect.y += self.yvel
-        self.collide(0, self.yvel, platforms)
+        self.collide(0, self.yvel, platforms, enemys)
 
         self.rect.x += self.xvel
-        self.collide(self.xvel, 0, platforms)
+        self.collide(self.xvel, 0, platforms, enemys)
 
-    def collide(self, xvel, yvel, platforms):
+    def collide(self, xvel, yvel, platforms, enemys):
         for p in platforms:
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
 
@@ -169,8 +175,19 @@ class Player(GameObject):
                     self.rect.top = p.rect.bottom  # то не движется вверх
                     self.yvel = 0  # и энергия прыжка пропадает
 
+        for e in enemys: # Коллизия с противником
+            if sprite.collide_rect(self, e):
+                if xvel > 0:
+                    self.rect.right = e.rect.left
+                if xvel < 0:
+                    self.rect.left = e.rect.right
+                if yvel > 0:
+                    self.rect.bottom = e.rect.top
+                    self.onGround = True
+                    self.yvel = 0
+
     def update(self):
-        self.get_input(platforms)
+        self.get_input(platforms, enemys)
         if self.rect.left > WIDTH:
             self.rect.right = 0
         if self.rect.right < 0:
@@ -185,6 +202,41 @@ class Enemy(GameObject):
         self.image = pygame.Surface((30, 30))
         self.image.fill(YELLOW)
         self.rect = pygame.Rect(x, y, 30, 30)
+        #Так как враг будет перемещаться к игроку + для колизии
+        self.xvel = 0
+        self.yvel = 0
+
+    def enemy_collide(self, xvel, yvel, platforms):
+        for p in platforms:
+            if sprite.collide_rect(self, p):  # Проверяем на пересечение противника с платформой
+
+                if xvel > 0:  # Если противник движется вправо, то запрещаем
+                    self.rect.right = p.rect.left
+
+                if xvel < 0:  # Если противник движется в лево, то запрещаем
+                    self.rect.left = p.rect.right
+
+                if yvel > 0:  # Если противник падает вниз под гравитацией,
+                    self.rect.bottom = p.rect.top  # то не падает вниз, как только сопрекасается с верхушкой платформы
+                    self.onGround = True  # и становится на ноги твёрдо
+                    self.yvel = 0  # Убираем энергию падения
+
+                if yvel < 0:  # Если противник движется вверх, то запрещаем ему двигаться туда
+                    self.rect.top = p.rect.bottom
+                    self.yvel = 0  # Убираем энергию прыжка
+
+    def moving(self, platfroms): # Функция с перемещением противника
+        if not self.onGround:
+            self.yvel += GRAVITY
+
+        self.onGround = False  # Мы не знаем, когда мы на земле((
+        self.rect.y += self.yvel
+        self.enemy_collide(0, self.yvel, platforms)
+
+        self.rect.x += self.xvel
+        self.enemy_collide(self.xvel, 0, platforms)
+    def update(self):
+        self.moving(platforms)
 
 
 # Создаем игру и окно
