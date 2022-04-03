@@ -1,8 +1,6 @@
 import pygame
-import keyboard
-import random
-
 from pygame import sprite
+from random import randint
 
 WIDTH = 800
 HEIGHT = 600
@@ -46,38 +44,46 @@ FIRST_LVL = [
 
 
 class GameObject(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
+    def __init__(self, x, y, width, height, color):
+        super().__init__()
+        
+        self.image = pygame.Surface((width, height))
+        self.image.fill(color)
+        
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        
+        self.width = width
+        self.height = height
 
 
 # В будущем будет отдельный файл для уровней
 
 def draw_lvl(LVL):
-    x = y = 0  # координаты
-    for row in LVL:  # вся строка
-        for col in row:  # каждый символ
-            if col == "-":
-                pf = Platforms(x, y)
-                all_sprites.add(pf)
-                platforms.append(pf)
-                # Заносим платформу в массив для последующей проверки пересечений
 
-            if col == "e":
-                enemy = Enemy(x, y)
-                all_sprites.add(enemy)
-                enemys.append(enemy)
+    for y, row in enumerate(LVL):  # вся строка
+        for x, col in enumerate(row):  # каждый символ
+			
+            if col == ' ': #поскольку пустота самая частая лучше сразу её отбросить и не гонять лишний раз кучу условий
+                continue
+            
+            elif col == "-":
+                createdObject = Platforms(x*PLATFORM_WIDTH, y*PLATFORM_HEIGHT)
+                platforms.append(createdObject)
 
-            x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
-        y += PLATFORM_HEIGHT  # то же самое и с высотой
-        x = 0  # на каждой новой строчке начинаем с нуля
+            elif col == "e":
+                createdObject = Enemy(x*PLATFORM_WIDTH, y*PLATFORM_HEIGHT)
+                enemys.append(createdObject)
+                
+            all_sprites.add(createdObject)
 
+            
 
-class Platforms(GameObject):
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
-        self.image.fill(WHITE)
-        self.rect = pygame.Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
+class Platforms(GameObject): #как видно класс не имеет смысла и на данном этапе имеет смысл сразу создавать GameObject без посредников 
+    def __init__(self, x, y): #но возможно в будущем это будет иметь смысл так что пока оставим
+        super().__init__(x = x, y = y, width = PLATFORM_WIDTH, height = PLATFORM_HEIGHT, color = WHITE)
+
 
 
 # Надо бы перенести в отдельный файл Игрока и Game_Object
@@ -90,98 +96,105 @@ ATTACK_HEIGHT = 30
 
 
 class AttackSprite(GameObject):
-    def __init__(self, looking_right, looking_down):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
-        self.image.fill(RED)
-        self.rect = self.image.get_rect()
-        if looking_right:
-            self.rect.left = player.rect.right
-            self.rect.top = player.rect.top
-            self.creation_time = pygame.time.get_ticks()
-        if not looking_right:
-            self.rect.right = player.rect.left
-            self.rect.top = player.rect.top
-            self.creation_time = pygame.time.get_ticks()
-        if looking_down: #Для удара снизу
-            pass
+    def __init__(self, owner):
+        
+        self.owner = owner
+
+            
+        super().__init__(x = -50, y = 0, width = ATTACK_WIDTH, height = ATTACK_HEIGHT, color = RED)
+        self.creation_time = pygame.time.get_ticks()
+
 
     def update(self):
+        
         if (pygame.time.get_ticks() - self.creation_time) > ATTACK_TIME:
-            self.kill()
             player.is_attacking = False
+            self.kill()
+            if self.owner != 'player':
+                enemys[self.owner].attacked = False
+            return
+        
+        if self.owner == 'player': 
+			
+            self.rect.y = player.rect.y
+            if player.dx>0:
+                self.rect.x = player.rect.x + player.width
+            else:
+                self.rect.x = player.rect.x - ATTACK_WIDTH
+                
+                
+            for enemy in enemys:
+                if sprite.collide_rect(enemy, self):
+                    enemy.hp -= 1
 
+        else: 
 
+            if player.rect.x >= enemys[self.owner].rect.x:	        
+                self.rect.x = enemys[self.owner].rect.x + enemys[self.owner].rect.width
+            elif player.rect.x <= enemys[self.owner].rect.x:	        
+                self.rect.x = enemys[self.owner].rect.x - ATTACK_WIDTH
+            self.rect.y = enemys[self.owner].rect.y
+               
+            if sprite.collide_rect(player, self):
+                player.hp -= 1
+				
 class Player(GameObject):
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((30, 30))
-        self.image.fill(GREEN)
-        self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        self.yvel = 0
-        self.xvel = 0
+        super().__init__(x = WIDTH / 2 + 15, y = HEIGHT / 2 + 15, width = 30, height = 30, color = GREEN)
+        
+        self.dy, self.dx = 0, 0
         self.onGround = True
-        self.looking_right = True
-        self.looking_down = False
+        self.enemyKilled = 0
         self.is_attacking = False
-
+        self.hp = 100
     def get_input(self, platforms, enemys):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_w]:
-            if self.onGround:
-                self.yvel = -J_POWER
-        if keys[pygame.K_d]:
-            self.xvel = MOVE_SPEED
-            self.looking_right = True
-        if keys[pygame.K_a]:
-            self.xvel = -MOVE_SPEED
-            self.looking_right = False
-        if keys[pygame.K_s]:
-            self.looking_down = True
-        if not (keys[pygame.K_d] or keys[pygame.K_a]):
-            self.xvel = 0
-        if not self.onGround:
-            self.yvel += GRAVITY
+        self.dx = (keys[pygame.K_d] - keys[pygame.K_a]) * MOVE_SPEED
+        
+        if self.onGround:
+            self.dy = -J_POWER * keys[pygame.K_w]
+        else:
+            self.dy += GRAVITY
+
         if keys[pygame.K_SPACE] and not self.is_attacking:
-            attack = AttackSprite(self.looking_right, self.looking_down)
+            attack = AttackSprite(owner='player')
             all_sprites.add(attack)
             self.is_attacking = True
 
         self.onGround = False  # Мы не знаем, когда мы на земле((
-        self.rect.y += self.yvel
-        self.collide(0, self.yvel, platforms, enemys)
+        self.rect.y += self.dy
+        self.collide(0, self.dy, platforms, enemys)
 
-        self.rect.x += self.xvel
-        self.collide(self.xvel, 0, platforms, enemys)
+        self.rect.x += self.dx
+        self.collide(self.dx, 0, platforms, enemys)
 
-    def collide(self, xvel, yvel, platforms, enemys):
+    def collide(self,dx, dy, platforms, enemys):
         for p in platforms:
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
 
-                if xvel > 0:  # если движется вправо
+                if dx > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо
 
-                if xvel < 0:  # если движется влево
+                if dx < 0:  # если движется влево
                     self.rect.left = p.rect.right  # то не движется влево
 
-                if yvel > 0:  # если падает вниз
+                if dy > 0:  # если падает вниз
                     self.rect.bottom = p.rect.top  # то не падает вниз
                     self.onGround = True  # и становится на что-то твердое
-                    self.yvel = 0  # и энергия падения пропадает
+                    self.dy = 0  # и энергия падения пропадает
 
-                if yvel < 0:  # если движется вверх
+                if dy < 0:  # если движется вверх
                     self.rect.top = p.rect.bottom  # то не движется вверх
-                    self.yvel = 0  # и энергия прыжка пропадает
+                    self.dy = 0  # и энергия прыжка пропадает
 
         for e in enemys: # Коллизия с противником
             if sprite.collide_rect(self, e):
-                if xvel > 0:
+                if dx > 0:
                     self.rect.right = e.rect.left
-                if xvel < 0:
+                if dx < 0:
                     self.rect.left = e.rect.right
-                if yvel > 0:
+                if dy > 0:
                     self.rect.bottom = e.rect.top
                     self.onGround = True
                     self.yvel = 0
@@ -191,21 +204,26 @@ class Player(GameObject):
         if self.rect.left > WIDTH:
             self.rect.right = 0
         if self.rect.right < 0:
-            self.rect.left = WIDTH
+            self.rect.left = WIDTH    
+        if player.hp == 0:
+            print('death')
+            player.hp = -1 
+            player.kill()
+
 
 
 #TODO: Сделать врагам физику, коллизии, получение урона от атак
 class Enemy(GameObject):
     def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
+        super().__init__(x = x, y = y, width = 30, height = 30, color = YELLOW)
         self.onGround = False
-        self.image = pygame.Surface((30, 30))
-        self.image.fill(YELLOW)
-        self.rect = pygame.Rect(x, y, 30, 30)
+
         #Так как враг будет перемещаться к игроку + для колизии
         self.xvel = 0
         self.yvel = 0
-
+        self.id = len(enemys)
+        self.hp = 10
+        self.attacked = False# не атакует
     def enemy_collide(self, xvel, yvel, platforms):
         for p in platforms:
             if sprite.collide_rect(self, p):  # Проверяем на пересечение противника с платформой
@@ -230,6 +248,7 @@ class Enemy(GameObject):
             self.yvel += GRAVITY
 
         self.onGround = False  # Мы не знаем, когда мы на земле((
+        
         self.rect.y += self.yvel
         self.enemy_collide(0, self.yvel, platforms)
 
@@ -237,6 +256,20 @@ class Enemy(GameObject):
         self.enemy_collide(self.xvel, 0, platforms)
     def update(self):
         self.moving(platforms)
+        
+        if self.hp <= 0:
+            self.rect.x = -50
+            self.kill()
+            
+        if self.rect.y == player.rect.y and ((abs(self.rect.x - player.rect.x+player.rect.width) < ATTACK_WIDTH) or (abs(self.rect.x - player.rect.x-player.rect.width) < ATTACK_WIDTH)) :
+            if not self.attacked and randint(1,5) == 3: #немного глупости что бы не был непобедимым
+                
+                attack = AttackSprite(self.id)
+                all_sprites.add(attack)
+                self.attacked = True
+        else:
+            self.attacked = False
+            
 
 
 # Создаем игру и окно
@@ -257,6 +290,8 @@ while running:
     # Держим цикл на правильной скорости
     clock.tick(FPS)
     # Ввод процесса (события)
+    pygame.display.set_caption('FPS: ' + str(round(clock.get_fps())) + 
+                     '          PLAYER_HP: ' + str(player.hp))
     for event in pygame.event.get():
         # check for closing window
         if event.type == pygame.QUIT:
