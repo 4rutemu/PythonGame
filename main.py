@@ -29,7 +29,7 @@ ATTACK_HEIGHT = 30
 
 platforms = []  # Массив платформ
 enemys = []
-FIRST_LVL = [
+first_lvl = [
     "                            ",
     "                            ",
     "                            ",
@@ -200,9 +200,11 @@ class Enemy(GameObject):
     def __init__(self, x, y):
         super().__init__(x, y, 30, 30, YELLOW)
         self.onGround = False
+        self.turn_after = 40
+        self.count = 0
 
         #Так как враг будет перемещаться к игроку + для колизии
-        self.xd = 0
+        self.dx = 0
         self.dy = 0
 
     def enemy_collide(self, dx, dy, platforms):
@@ -224,19 +226,37 @@ class Enemy(GameObject):
                     self.rect.top = p.rect.bottom
                     self.dy = 0  # Убираем энергию прыжка
 
-    def moving(self, platfroms): # Функция с перемещением противника
+    def moving(self, plarforms): # Функция с перемещением противника
         if not self.onGround:
             self.dy += GRAVITY
         self.onGround = False  # Мы не знаем, когда мы на земле
-
         self.rect.y += self.dy
         self.enemy_collide(0, self.dy, platforms)
 
-        self.rect.x += self.xd
-        self.enemy_collide(self.xd, 0, platforms)
+        #Если сможешь понять, как привязать к фпс, то уважуха или к таймеру, ибо не понял. Так что сделал счётчик такой вот
+        #Пока работет, но интересно, как с атакой сделать, чтобы за челом бегали
+        if self.turn_after > 0:
+            self.dx = 2
+            self.turn_after -= 1
+            if self.turn_after == 0:
+                self.dx = 0
+                self.turn_after = -40
+        elif self.turn_after < 0:
+            self.dx = -2
+            self.turn_after += 1
+            if self.turn_after == 0:
+                self.dx = 0
+                self.turn_after = 40
+
+
+
+
+        self.rect.x += self.dx
+        self.enemy_collide(self.dx, 0, platforms)
 
     def update(self):
         self.moving(platforms)
+
 
 
 # Создаем игру и окно
@@ -248,7 +268,7 @@ clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 player = Player()
 
-draw_lvl(FIRST_LVL)
+draw_lvl(first_lvl)
 all_sprites.add(player)
 
 # Цикл игры
