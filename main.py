@@ -1,7 +1,6 @@
 import pygame
 import keyboard
 import random
-
 from pygame import sprite
 
 WIDTH = 800
@@ -19,6 +18,14 @@ YELLOW = (255, 255, 0)
 PLATFORM_WIDTH = 30
 PLATFORM_HEIGHT = 30
 PLATFORM_COLOUR = WHITE
+
+GRAVITY = 0.35
+J_POWER = 10
+MOVE_SPEED = 7
+
+ATTACK_TIME = 200
+ATTACK_WIDTH = 10
+ATTACK_HEIGHT = 30
 
 platforms = []  # Массив платформ
 enemys = []
@@ -46,23 +53,32 @@ FIRST_LVL = [
 
 
 class GameObject(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
+    def __init__(self, x, y, width, height, colour):
+        super().__init__()
+        self.image = pygame.Surface((width, height))
+        self.image.fill(colour)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.width = width
+        self.height = height
 
 
 # В будущем будет отдельный файл для уровней
 
 def draw_lvl(LVL):
-    x = y = 0  # координаты
-    for row in LVL:  # вся строка
-        for col in row:  # каждый символ
-            if col == "-":
+    x = y = 0
+    for row in LVL:
+        for col in row:
+            if col == "": # Пропускаем пустые символы, чтобы не тратить лишнее время
+                continue
+            elif col == "-":
                 pf = Platforms(x, y)
                 all_sprites.add(pf)
                 platforms.append(pf)
-                # Заносим платформу в массив для последующей проверки пересечений
 
-            if col == "e":
+            elif col == "e":
                 enemy = Enemy(x, y)
                 all_sprites.add(enemy)
                 enemys.append(enemy)
@@ -74,19 +90,7 @@ def draw_lvl(LVL):
 
 class Platforms(GameObject):
     def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
-        self.image.fill(WHITE)
-        self.rect = pygame.Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
-
-
-# Надо бы перенести в отдельный файл Игрока и Game_Object
-GRAVITY = 0.35
-J_POWER = 10
-MOVE_SPEED = 7
-ATTACK_TIME = 200
-ATTACK_WIDTH = 10
-ATTACK_HEIGHT = 30
+        super().__init__(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT, WHITE)
 
 
 class AttackSprite(GameObject):
@@ -114,13 +118,10 @@ class AttackSprite(GameObject):
 
 class Player(GameObject):
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((30, 30))
-        self.image.fill(GREEN)
-        self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        self.yvel = 0
-        self.xvel = 0
+        super().__init__(WIDTH / 2, HEIGHT / 2, 30, 30, GREEN)
+
+        self.dy = 0
+        self.dx = 0
         self.onGround = True
         self.looking_right = True
         self.looking_down = False
@@ -131,60 +132,60 @@ class Player(GameObject):
 
         if keys[pygame.K_w]:
             if self.onGround:
-                self.yvel = -J_POWER
+                self.dy = -J_POWER
         if keys[pygame.K_d]:
-            self.xvel = MOVE_SPEED
+            self.dx = MOVE_SPEED
             self.looking_right = True
         if keys[pygame.K_a]:
-            self.xvel = -MOVE_SPEED
+            self.dx = -MOVE_SPEED
             self.looking_right = False
         if keys[pygame.K_s]:
             self.looking_down = True
         if not (keys[pygame.K_d] or keys[pygame.K_a]):
-            self.xvel = 0
+            self.dx = 0
         if not self.onGround:
-            self.yvel += GRAVITY
+            self.dy += GRAVITY
         if keys[pygame.K_SPACE] and not self.is_attacking:
             attack = AttackSprite(self.looking_right, self.looking_down)
             all_sprites.add(attack)
             self.is_attacking = True
 
-        self.onGround = False  # Мы не знаем, когда мы на земле((
-        self.rect.y += self.yvel
-        self.collide(0, self.yvel, platforms, enemys)
+        self.onGround = False  #Неизвестно, когда он на земле
+        self.rect.y += self.dy
+        self.collide(0, self.dy, platforms, enemys)
 
-        self.rect.x += self.xvel
-        self.collide(self.xvel, 0, platforms, enemys)
+        self.rect.x += self.dx
+        self.collide(self.dx, 0, platforms, enemys)
 
-    def collide(self, xvel, yvel, platforms, enemys):
+    def collide(self, dx, dy, platforms, enemys):
         for p in platforms:
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
 
-                if xvel > 0:  # если движется вправо
+                if dx > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо
 
-                if xvel < 0:  # если движется влево
+                if dx < 0:  # если движется влево
                     self.rect.left = p.rect.right  # то не движется влево
 
-                if yvel > 0:  # если падает вниз
+                if dy > 0:  # если падает вниз
                     self.rect.bottom = p.rect.top  # то не падает вниз
                     self.onGround = True  # и становится на что-то твердое
-                    self.yvel = 0  # и энергия падения пропадает
+                    self.dy = 0  # и энергия падения пропадает
 
-                if yvel < 0:  # если движется вверх
+                if dy < 0:  # если движется вверх
                     self.rect.top = p.rect.bottom  # то не движется вверх
-                    self.yvel = 0  # и энергия прыжка пропадает
+                    self.dy = 0  # и энергия прыжка пропадает
 
         for e in enemys: # Коллизия с противником
             if sprite.collide_rect(self, e):
-                if xvel > 0:
+                if dx > 0:
                     self.rect.right = e.rect.left
-                if xvel < 0:
+                if dx < 0:
                     self.rect.left = e.rect.right
-                if yvel > 0:
+                if dy > 0:
                     self.rect.bottom = e.rect.top
                     self.onGround = True
-                    self.yvel = 0
+                    self.dy = 0
 
     def update(self):
         self.get_input(platforms, enemys)
@@ -197,44 +198,43 @@ class Player(GameObject):
 #TODO: Сделать врагам физику, коллизии, получение урона от атак
 class Enemy(GameObject):
     def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
+        super().__init__(x, y, 30, 30, YELLOW)
         self.onGround = False
-        self.image = pygame.Surface((30, 30))
-        self.image.fill(YELLOW)
-        self.rect = pygame.Rect(x, y, 30, 30)
-        #Так как враг будет перемещаться к игроку + для колизии
-        self.xvel = 0
-        self.yvel = 0
 
-    def enemy_collide(self, xvel, yvel, platforms):
+        #Так как враг будет перемещаться к игроку + для колизии
+        self.xd = 0
+        self.dy = 0
+
+    def enemy_collide(self, dx, dy, platforms):
         for p in platforms:
             if sprite.collide_rect(self, p):  # Проверяем на пересечение противника с платформой
 
-                if xvel > 0:  # Если противник движется вправо, то запрещаем
+                if dx > 0:  # Если противник движется вправо, то запрещаем
                     self.rect.right = p.rect.left
 
-                if xvel < 0:  # Если противник движется в лево, то запрещаем
+                if dx < 0:  # Если противник движется в лево, то запрещаем
                     self.rect.left = p.rect.right
 
-                if yvel > 0:  # Если противник падает вниз под гравитацией,
+                if dy > 0:  # Если противник падает вниз под гравитацией,
                     self.rect.bottom = p.rect.top  # то не падает вниз, как только сопрекасается с верхушкой платформы
                     self.onGround = True  # и становится на ноги твёрдо
-                    self.yvel = 0  # Убираем энергию падения
+                    self.dy = 0  # Убираем энергию падения
 
-                if yvel < 0:  # Если противник движется вверх, то запрещаем ему двигаться туда
+                if dy < 0:  # Если противник движется вверх, то запрещаем ему двигаться туда
                     self.rect.top = p.rect.bottom
-                    self.yvel = 0  # Убираем энергию прыжка
+                    self.dy = 0  # Убираем энергию прыжка
 
     def moving(self, platfroms): # Функция с перемещением противника
         if not self.onGround:
-            self.yvel += GRAVITY
+            self.dy += GRAVITY
+        self.onGround = False  # Мы не знаем, когда мы на земле
 
-        self.onGround = False  # Мы не знаем, когда мы на земле((
-        self.rect.y += self.yvel
-        self.enemy_collide(0, self.yvel, platforms)
+        self.rect.y += self.dy
+        self.enemy_collide(0, self.dy, platforms)
 
-        self.rect.x += self.xvel
-        self.enemy_collide(self.xvel, 0, platforms)
+        self.rect.x += self.xd
+        self.enemy_collide(self.xd, 0, platforms)
+
     def update(self):
         self.moving(platforms)
 
