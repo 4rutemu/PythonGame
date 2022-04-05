@@ -5,7 +5,7 @@ from pygame import sprite
 
 WIDTH = 800
 HEIGHT = 600
-FPS = 30
+FPS = 45
 
 # Задаем цвета
 WHITE = (255, 255, 255)
@@ -72,7 +72,7 @@ def draw_lvl(LVL):
     x = y = 0
     for row in LVL:
         for col in row:
-            if col == "": # Пропускаем пустые символы, чтобы не тратить лишнее время
+            if col == "":  # Пропускаем пустые символы, чтобы не тратить лишнее время
                 continue
             elif col == "-":
                 pf = Platforms(x, y)
@@ -111,7 +111,7 @@ class AttackSprite(GameObject):
             self.rect.right = player.rect.left
             self.rect.top = player.rect.top
             self.creation_time = pygame.time.get_ticks()
-        if looking_down: #Для удара снизу
+        if looking_down:  # Для удара снизу
             pass
 
     def update(self):
@@ -154,7 +154,7 @@ class Player(GameObject):
             all_sprites.add(attack)
             self.is_attacking = True
 
-        self.onGround = False  #Неизвестно, когда он на земле
+        self.onGround = False  # Неизвестно, когда он на земле
         self.rect.y += self.dy
         self.collide(0, self.dy, platforms, enemys)
 
@@ -180,7 +180,7 @@ class Player(GameObject):
                     self.rect.top = p.rect.bottom  # то не движется вверх
                     self.dy = 0  # и энергия прыжка пропадает
 
-        for e in enemys: # Коллизия с противником
+        for e in enemys:  # Коллизия с противником
             if sprite.collide_rect(self, e):
                 if dx > 0:
                     self.rect.right = e.rect.left
@@ -199,59 +199,40 @@ class Player(GameObject):
             self.rect.left = WIDTH
 
 
-#TODO: Сделать врагам физику, получение урона от атак
+# TODO: получение урона от атак
 class Enemy(GameObject):
     def __init__(self, x, y):
         super().__init__(x, y, 30, 30, YELLOW)
-        self.onGround = False
 
-        #Так как враг будет перемещаться к игроку + для колизии
+        # Так как враг будет перемещаться к игроку + для колизии
         self.dx = 2
         self.dy = 0
 
     def enemy_collide(self, dx, dy, platforms, stoppers):
         for p in platforms:
             if sprite.collide_rect(self, p):  # Проверяем на пересечение противника с платформой
-
                 if dx > 0:  # Если противник движется вправо, то запрещаем
                     self.rect.right = p.rect.left
                     self.dx = -2
-
                 if dx < 0:  # Если противник движется в лево, то запрещаем
                     self.rect.left = p.rect.right
                     self.dx = 2
 
-                if dy > 0:  # Если противник падает вниз под гравитацией,
-                    self.rect.bottom = p.rect.top  # то не падает вниз, как только сопрекасается с верхушкой платформы
-                    self.onGround = True  # и становится на ноги твёрдо
-                    self.dy = 0  # Убираем энергию падения
-
-                if dy < 0:  # Если противник движется вверх, то запрещаем ему двигаться туда
-                    self.rect.top = p.rect.bottom
-                    self.dy = 0  # Убираем энергию прыжка
         for s in stoppers:
             if sprite.collide_rect(self, s):
                 if dx > 0:  # Если противник движется вправо, то запрещаем
                     self.rect.right = s.rect.left
                     self.dx = -2
-
                 if dx < 0:  # Если противник движется в лево, то запрещаем
                     self.rect.left = s.rect.right
                     self.dx = 2
 
-    def moving(self, plarforms, stoppers): # Функция с перемещением противника
-        if not self.onGround:
-            self.dy += GRAVITY
-        self.onGround = False  # Мы не знаем, когда мы на земле
-        self.rect.y += self.dy
-        self.enemy_collide(0, self.dy, platforms, stoppers)
-
+    def moving(self, plarforms, stoppers):  # Функция с перемещением противника
         self.rect.x += self.dx
         self.enemy_collide(self.dx, 0, platforms, stoppers)
 
     def update(self):
         self.moving(platforms, stoppers)
-
 
 
 # Создаем игру и окно
