@@ -29,27 +29,28 @@ ATTACK_HEIGHT = 30
 
 platforms = []  # Массив платформ
 enemys = []
+stoppers = []
 first_lvl = [
-    "                            ",
-    "                            ",
-    "                            ",
-    "                            ",
-    "             --             ",
-    "          e                  ",
-    "  e                         ",
-    "-----   -----               ",
-    "                    ---     ",
-    "                            ",
-    "----   --------            ",
-    "                            ",
-    "                            ",
-    "---------------             ",
-    "                            ",
-    "                    e ------",
-    "    e           ------------",
-    "                            ",
-    "                            ",
-    "----------------------------"]
+    "                             ",
+    "                             ",
+    "                             ",
+    "                             ",
+    "             --              ",
+    "                             ",
+    "x   e x x  e  x              ",
+    " -----   -----               ",
+    "                    ---      ",
+    "                             ",
+    "----   --------              ",
+    "                             ",
+    "                             ",
+    "---------------              ",
+    "                             ",
+    "               x    e -------",
+    "                -------------",
+    "                             ",
+    "x      e                     x",
+    "---------------------------- "]
 
 
 class GameObject(pygame.sprite.Sprite):
@@ -77,6 +78,9 @@ def draw_lvl(LVL):
                 pf = Platforms(x, y)
                 all_sprites.add(pf)
                 platforms.append(pf)
+            elif col == "x":
+                stop = Platforms(x, y)
+                stoppers.append(stop)
 
             elif col == "e":
                 enemy = Enemy(x, y)
@@ -195,27 +199,27 @@ class Player(GameObject):
             self.rect.left = WIDTH
 
 
-#TODO: Сделать врагам физику, коллизии, получение урона от атак
+#TODO: Сделать врагам физику, получение урона от атак
 class Enemy(GameObject):
     def __init__(self, x, y):
         super().__init__(x, y, 30, 30, YELLOW)
         self.onGround = False
-        self.turn_after = 40
-        self.count = 0
 
         #Так как враг будет перемещаться к игроку + для колизии
-        self.dx = 0
+        self.dx = 2
         self.dy = 0
 
-    def enemy_collide(self, dx, dy, platforms):
+    def enemy_collide(self, dx, dy, platforms, stoppers):
         for p in platforms:
             if sprite.collide_rect(self, p):  # Проверяем на пересечение противника с платформой
 
                 if dx > 0:  # Если противник движется вправо, то запрещаем
                     self.rect.right = p.rect.left
+                    self.dx = -2
 
                 if dx < 0:  # Если противник движется в лево, то запрещаем
                     self.rect.left = p.rect.right
+                    self.dx = 2
 
                 if dy > 0:  # Если противник падает вниз под гравитацией,
                     self.rect.bottom = p.rect.top  # то не падает вниз, как только сопрекасается с верхушкой платформы
@@ -225,37 +229,28 @@ class Enemy(GameObject):
                 if dy < 0:  # Если противник движется вверх, то запрещаем ему двигаться туда
                     self.rect.top = p.rect.bottom
                     self.dy = 0  # Убираем энергию прыжка
+        for s in stoppers:
+            if sprite.collide_rect(self, s):
+                if dx > 0:  # Если противник движется вправо, то запрещаем
+                    self.rect.right = s.rect.left
+                    self.dx = -2
 
-    def moving(self, plarforms): # Функция с перемещением противника
+                if dx < 0:  # Если противник движется в лево, то запрещаем
+                    self.rect.left = s.rect.right
+                    self.dx = 2
+
+    def moving(self, plarforms, stoppers): # Функция с перемещением противника
         if not self.onGround:
             self.dy += GRAVITY
         self.onGround = False  # Мы не знаем, когда мы на земле
         self.rect.y += self.dy
-        self.enemy_collide(0, self.dy, platforms)
-
-        #Если сможешь понять, как привязать к фпс, то уважуха или к таймеру, ибо не понял. Так что сделал счётчик такой вот
-        #Пока работет, но интересно, как с атакой сделать, чтобы за челом бегали
-        if self.turn_after > 0:
-            self.dx = 2
-            self.turn_after -= 1
-            if self.turn_after == 0:
-                self.dx = 0
-                self.turn_after = -40
-        elif self.turn_after < 0:
-            self.dx = -2
-            self.turn_after += 1
-            if self.turn_after == 0:
-                self.dx = 0
-                self.turn_after = 40
-
-
-
+        self.enemy_collide(0, self.dy, platforms, stoppers)
 
         self.rect.x += self.dx
-        self.enemy_collide(self.dx, 0, platforms)
+        self.enemy_collide(self.dx, 0, platforms, stoppers)
 
     def update(self):
-        self.moving(platforms)
+        self.moving(platforms, stoppers)
 
 
 
