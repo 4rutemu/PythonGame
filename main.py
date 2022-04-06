@@ -2,6 +2,7 @@ import pygame
 import keyboard
 import random
 from pygame import sprite
+import button
 
 WIDTH = 800
 HEIGHT = 600
@@ -64,6 +65,7 @@ class GameObject(pygame.sprite.Sprite):
         self.rect.y = y
         self.width = width
         self.height = height
+
 
 def draw_lvl(LVL):
     x = y = 0
@@ -245,6 +247,7 @@ player = Player()
 
 draw_lvl(first_lvl)
 all_sprites.add(player)
+start_img = pygame.image.load("m_Start-Button.png").convert_alpha()
 
 
 def game():
@@ -263,4 +266,24 @@ def game():
         all_sprites.draw(screen)
         pygame.display.flip()
     pygame.quit()
-game()
+
+
+start_btn = button.Button(x=300, y=400, image=start_img)
+font = pygame.font.SysFont('serif', 48)
+name = font.render("Time_Killer", True, RED)
+
+def main_menu():
+    running = True
+    while running:
+        screen.fill(BLACK)
+        screen.blit(name, (290, 300))
+        pygame.display.set_caption("Main Menu")
+        if start_btn.draw(screen):
+            game()
+            running = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        pygame.display.update()
+
+main_menu()
