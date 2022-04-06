@@ -240,7 +240,6 @@ class Enemy(GameObject):
 pygame.init()
 # pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Time_Killer")
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 player = Player()
@@ -253,6 +252,7 @@ start_img = pygame.image.load("m_Start-Button.png").convert_alpha()
 def game():
     running = True
     while running:
+        pygame.display.set_caption("Time_Killer")
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
