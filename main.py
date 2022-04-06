@@ -65,9 +65,6 @@ class GameObject(pygame.sprite.Sprite):
         self.width = width
         self.height = height
 
-
-# В будущем будет отдельный файл для уровней
-
 def draw_lvl(LVL):
     x = y = 0
     for row in LVL:
@@ -203,12 +200,14 @@ class Player(GameObject):
 class Enemy(GameObject):
     def __init__(self, x, y):
         super().__init__(x, y, 30, 30, YELLOW)
-
+        self.dx = 0
         # Так как враг будет перемещаться к игроку + для колизии
-        self.dx = 2
-        self.dy = 0
+        if random.random() != 0:
+            self.dx = 2
+        else:
+            self.dx = -2
 
-    def enemy_collide(self, dx, dy, platforms, stoppers):
+    def enemy_collide(self, dx, platforms, stoppers):
         for p in platforms:
             if sprite.collide_rect(self, p):  # Проверяем на пересечение противника с платформой
                 if dx > 0:  # Если противник движется вправо, то запрещаем
@@ -229,7 +228,7 @@ class Enemy(GameObject):
 
     def moving(self, plarforms, stoppers):  # Функция с перемещением противника
         self.rect.x += self.dx
-        self.enemy_collide(self.dx, 0, platforms, stoppers)
+        self.enemy_collide(self.dx, platforms, stoppers)
 
     def update(self):
         self.moving(platforms, stoppers)
@@ -239,7 +238,7 @@ class Enemy(GameObject):
 pygame.init()
 # pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("platformer")
+pygame.display.set_caption("Time_Killer")
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 player = Player()
@@ -247,22 +246,21 @@ player = Player()
 draw_lvl(first_lvl)
 all_sprites.add(player)
 
-# Цикл игры
-running = True
-while running:
-    # Держим цикл на правильной скорости
-    clock.tick(FPS)
-    # Ввод процесса (события)
-    for event in pygame.event.get():
-        # check for closing window
-        if event.type == pygame.QUIT:
-            running = False
-    # Обновление
-    all_sprites.update()
 
-    # Отрисовка
-    screen.fill(BLACK)
+def game():
+    running = True
+    while running:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        # Обновление
+        all_sprites.update()
 
-    all_sprites.draw(screen)
-    pygame.display.flip()
-pygame.quit()
+        # Отрисовка
+        screen.fill(BLACK)
+
+        all_sprites.draw(screen)
+        pygame.display.flip()
+    pygame.quit()
+game()
