@@ -54,7 +54,6 @@ def draw_lvl(lvl):
 
 
 def game():
-    pygame.init()
     running = True
     while running:
         pygame.display.set_caption("Time_Killer")
@@ -75,9 +74,9 @@ def game():
 def main_menu():
     running = True
     while running:
+        pygame.display.set_caption("Main Menu")
         screen.fill(settings.BLACK)
         screen.blit(name, (290, 300))
-        pygame.display.set_caption("Main Menu")
         if start_btn.draw(screen):
             game()
             running = False
@@ -94,6 +93,7 @@ screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
 clock = pygame.time.Clock()
 
 player = player.Player()
+
 draw_lvl(first_lvl)
 settings.all_sprites.add(player)
 

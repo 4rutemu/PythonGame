@@ -26,7 +26,7 @@ class Player(game_object.GameObject):
         self.looking_down = False
         self.is_attacking = False
 
-    def get_input(self, pf, enemy_list):
+    def get_input(self, pf, enemies):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_w]:
@@ -45,18 +45,18 @@ class Player(game_object.GameObject):
         if not self.onGround:
             self.dy += GRAVITY
         if keys[pygame.K_SPACE] and not self.is_attacking:
-            attack = AttackSprite(self.looking_right, self.looking_down)
+            attack = AttackSprite(self.looking_right, self.looking_down, player=self)
             settings.all_sprites.add(attack)
             self.is_attacking = True
 
         self.onGround = False  # Неизвестно, когда он на земле
         self.rect.y += self.dy
-        self.collide(0, self.dy, pf, enemy_list)
+        self.collide(0, self.dy, pf, enemies)
 
         self.rect.x += self.dx
-        self.collide(self.dx, 0, pf, enemy_list)
+        self.collide(self.dx, 0, pf, enemies)
 
-    def collide(self, dx, dy, platforms, enemys):
+    def collide(self, dx, dy, platforms, enemies):
         for p in platforms:
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
 
@@ -75,7 +75,7 @@ class Player(game_object.GameObject):
                     self.rect.top = p.rect.bottom  # то не движется вверх
                     self.dy = 0  # и энергия прыжка пропадает
 
-        for e in enemys:  # Коллизия с противником
+        for e in enemies:  # Коллизия с противником
             if sprite.collide_rect(self, e):
                 if dx > 0:
                     self.rect.right = e.rect.left
@@ -95,18 +95,19 @@ class Player(game_object.GameObject):
 
 
 class AttackSprite(game_object.GameObject):
-    def __init__(self, looking_right, looking_down):
+    def __init__(self, looking_right, looking_down, player):
         pygame.sprite.Sprite.__init__(self)
+        self.player = player
         self.image = pygame.Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
         self.image.fill(settings.RED)
         self.rect = self.image.get_rect()
         if looking_right:
-            self.rect.left = Player.rect.right
-            self.rect.top = Player.rect.top
+            self.rect.left = player.rect.right
+            self.rect.top = player.rect.top
             self.creation_time = pygame.time.get_ticks()
         if not looking_right:
-            self.rect.right = Player.rect.left
-            self.rect.top = Player.rect.top
+            self.rect.right = player.rect.left
+            self.rect.top = player.rect.top
             self.creation_time = pygame.time.get_ticks()
         if looking_down:  # Для удара снизу
             pass
@@ -114,4 +115,4 @@ class AttackSprite(game_object.GameObject):
     def update(self):
         if (pygame.time.get_ticks() - self.creation_time) > ATTACK_TIME:
             self.kill()
-            Player.is_attacking = False
+            self.player.is_attacking = False
