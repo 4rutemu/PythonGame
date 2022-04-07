@@ -11,7 +11,7 @@ import enemy
 
 class Player(game_object.GameObject):
     def __init__(self):
-        super().__init__(parameters.WIDTH / 2, parameters.HEIGHT / 2, 30, 30, parameters.GREEN)
+        super().__init__(parameters.WIDTH / 2, parameters.HEIGHT / 2, 20, 30, parameters.GREEN)
 
         self.dy = 0
         self.dx = 0

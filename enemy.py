@@ -12,7 +12,7 @@ speed_list = [-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7]
 # TODO: получение урона от атак
 class Enemy(game_object.GameObject):
     def __init__(self, x, y):
-        super().__init__(x, y, 30, 30, (255, 255, 0))
+        super().__init__(x, y, 20, 30, (255, 255, 0))
         self.dx = speed_list[random.randint(0, 13)]
         # Так как враг будет перемещаться к игроку + для колизии
 
