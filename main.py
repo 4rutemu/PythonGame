@@ -81,6 +81,16 @@ def game(player):
         pygame.display.flip()
 
 
+def delliting(player): # Функция для удаления
+    for s in parameters.all_sprites:
+        s.kill()
+    for e in enemy.enemies:
+        e.kill()
+    for p in platform.platforms:
+        p.kill()
+    player.kill()
+
+
 def pause(player):
     paused = True
     while paused:
@@ -93,11 +103,8 @@ def pause(player):
         elif exit_btn.draw(screen):
             parameters.reload = True
             paused = False
-            for s in parameters.all_sprites:
-                s.kill()
-            for e in enemy.enemies:
-                e.kill()
-            player.kill()
+            delliting(player)
+
             main_menu()
 
         for event in pygame.event.get():
