@@ -6,7 +6,7 @@ import button
 import platform
 import enemy
 import parameters
-import player
+import player as hero
 import cam
 
 first_lvl = [
@@ -56,7 +56,7 @@ def draw_lvl(lvl):
         x = 0  # на каждой новой строчке начинаем с нуля
 
 
-def game():
+def game(player):
     running = True
     while running:
         pygame.display.set_caption("Time_Killer")
@@ -67,21 +67,21 @@ def game():
                 quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    pause()
+                    pause(player)
 
         # Обновление
         parameters.all_sprites.update()
 
         # Отрисовка
         screen.fill(parameters.BLACK)
+
         camera.update(player)  # центризируем камеру относительно персонажа
         for s in parameters.all_sprites:
             screen.blit(s.image, camera.apply(s))
         pygame.display.flip()
 
 
-# TODO: Реализовать стирание уровня при выходе в главное меню
-def pause():
+def pause(player):
     paused = True
     while paused:
         pygame.display.set_caption("Paused")
@@ -91,7 +91,13 @@ def pause():
         if pause_btn.draw(screen):
             paused = False
         elif exit_btn.draw(screen):
+            parameters.reload = True
             paused = False
+            for s in parameters.all_sprites:
+                s.kill()
+            for e in enemy.enemies:
+                e.kill()
+            player.kill()
             main_menu()
 
         for event in pygame.event.get():
@@ -102,15 +108,18 @@ def pause():
 
 
 def main_menu():
+
     running = True
     while running:
         pygame.display.set_caption("Main Menu")
         screen.fill(parameters.BLACK)
         screen.blit(name, (290, 300))
-
         if start_btn.draw(screen):
             running = False
-            game()
+            draw_lvl(first_lvl)
+            player = hero.Player()
+            parameters.all_sprites.add(player)
+            game(player)
         elif exit_btn.draw(screen):
             running = False
             pygame.quit()
@@ -142,10 +151,6 @@ pygame.init()
 # pygame.mixer.init()
 screen = pygame.display.set_mode((parameters.WIDTH, parameters.HEIGHT))
 clock = pygame.time.Clock()
-
-player = player.Player()
-draw_lvl(first_lvl)
-parameters.all_sprites.add(player)
 
 total_level_width = len(first_lvl[0]) * platform.PLATFORM_WIDTH  # Высчитываем фактическую ширину уровня
 total_level_height = len(first_lvl) * platform.PLATFORM_HEIGHT  # высоту
