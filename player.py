@@ -1,3 +1,4 @@
+
 import platform
 
 from pygame import sprite
@@ -21,7 +22,6 @@ class Player(game_object.GameObject):
 
     def get_input(self, pf, enemies):
         keys = pygame.key.get_pressed()
-
         if keys[pygame.K_w]:
             if self.onGround:
                 self.dy = -parameters.J_POWER
@@ -81,10 +81,6 @@ class Player(game_object.GameObject):
 
     def update(self):
         self.get_input(platform.platforms, enemy.enemies)
-        if self.rect.left > parameters.WIDTH:
-            self.rect.right = 0
-        if self.rect.right < 0:
-            self.rect.left = parameters.WIDTH
 
 
 class AttackSprite(game_object.GameObject):
