@@ -4,20 +4,13 @@ from pygame import sprite
 
 import game_object
 import pygame
-import settings
+import parameters
 import enemy
-
-GRAVITY = 0.35
-J_POWER = 10
-MOVE_SPEED = 7
-ATTACK_TIME = 200
-ATTACK_WIDTH = 10
-ATTACK_HEIGHT = 30
 
 
 class Player(game_object.GameObject):
     def __init__(self):
-        super().__init__(settings.WIDTH / 2, settings.HEIGHT / 2, 30, 30, settings.GREEN)
+        super().__init__(parameters.WIDTH / 2, parameters.HEIGHT / 2, 30, 30, parameters.GREEN)
 
         self.dy = 0
         self.dx = 0
@@ -31,22 +24,22 @@ class Player(game_object.GameObject):
 
         if keys[pygame.K_w]:
             if self.onGround:
-                self.dy = -J_POWER
+                self.dy = -parameters.J_POWER
         if keys[pygame.K_d]:
-            self.dx = MOVE_SPEED
+            self.dx = parameters.MOVE_SPEED
             self.looking_right = True
         if keys[pygame.K_a]:
-            self.dx = -MOVE_SPEED
+            self.dx = -parameters.MOVE_SPEED
             self.looking_right = False
         if keys[pygame.K_s]:
             self.looking_down = True
         if not (keys[pygame.K_d] or keys[pygame.K_a]):
             self.dx = 0
         if not self.onGround:
-            self.dy += GRAVITY
+            self.dy += parameters.GRAVITY
         if keys[pygame.K_SPACE] and not self.is_attacking:
             attack = AttackSprite(self.looking_right, self.looking_down, player=self)
-            settings.all_sprites.add(attack)
+            parameters.all_sprites.add(attack)
             self.is_attacking = True
 
         self.onGround = False  # Неизвестно, когда он на земле
@@ -88,18 +81,18 @@ class Player(game_object.GameObject):
 
     def update(self):
         self.get_input(platform.platforms, enemy.enemies)
-        if self.rect.left > settings.WIDTH:
+        if self.rect.left > parameters.WIDTH:
             self.rect.right = 0
         if self.rect.right < 0:
-            self.rect.left = settings.WIDTH
+            self.rect.left = parameters.WIDTH
 
 
 class AttackSprite(game_object.GameObject):
     def __init__(self, looking_right, looking_down, player):
         pygame.sprite.Sprite.__init__(self)
         self.player = player
-        self.image = pygame.Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
-        self.image.fill(settings.RED)
+        self.image = pygame.Surface((parameters.ATTACK_WIDTH, parameters.ATTACK_HEIGHT))
+        self.image.fill(parameters.RED)
         self.rect = self.image.get_rect()
         if looking_right:
             self.rect.left = player.rect.right
@@ -113,6 +106,6 @@ class AttackSprite(game_object.GameObject):
             pass
 
     def update(self):
-        if (pygame.time.get_ticks() - self.creation_time) > ATTACK_TIME:
+        if (pygame.time.get_ticks() - self.creation_time) > parameters.ATTACK_TIME:
             self.kill()
             self.player.is_attacking = False

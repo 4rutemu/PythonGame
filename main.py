@@ -1,9 +1,11 @@
+import sys
+
 import pygame
 
 import button
 import platform
 import enemy
-import settings
+import parameters
 import player
 
 first_lvl = [
@@ -37,7 +39,7 @@ def draw_lvl(lvl):
                 continue
             elif col == "-":
                 pf = platform.Platform(x, y)
-                settings.all_sprites.add(pf)
+                parameters.all_sprites.add(pf)
                 platform.platforms.append(pf)
             elif col == "x":
                 stop = platform.Platform(x, y)
@@ -45,7 +47,7 @@ def draw_lvl(lvl):
 
             elif col == "e":
                 enemyForList = enemy.Enemy(x, y)
-                settings.all_sprites.add(enemyForList)
+                parameters.all_sprites.add(enemyForList)
                 enemy.enemies.append(enemyForList)
 
             x += platform.PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
@@ -57,50 +59,57 @@ def game():
     running = True
     while running:
         pygame.display.set_caption("Time_Killer")
-        clock.tick(settings.FPS)
+        clock.tick(parameters.FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
         # Обновление
-        settings.all_sprites.update()
+        parameters.all_sprites.update()
 
         # Отрисовка
-        screen.fill(settings.BLACK)
-        settings.all_sprites.draw(screen)
+        screen.fill(parameters.BLACK)
+        parameters.all_sprites.draw(screen)
         pygame.display.flip()
-    pygame.quit()
 
 
 def main_menu():
     running = True
     while running:
         pygame.display.set_caption("Main Menu")
-        screen.fill(settings.BLACK)
+        screen.fill(parameters.BLACK)
         screen.blit(name, (290, 300))
+
         if start_btn.draw(screen):
             game()
+        elif exit_btn.draw(screen):
             running = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
+                sys.exit()
+
         pygame.display.flip()
 
 
 # Создаем игру и окно
 pygame.init()
 # pygame.mixer.init()
-screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
+screen = pygame.display.set_mode((parameters.WIDTH, parameters.HEIGHT))
 clock = pygame.time.Clock()
 
 player = player.Player()
 
 draw_lvl(first_lvl)
-settings.all_sprites.add(player)
+parameters.all_sprites.add(player)
 
 start_img = pygame.image.load("m_Start-Button.png").convert_alpha()
-start_btn = button.Button(x=300, y=400, image=start_img)
+start_btn = button.Button(x=200, y=400, image=start_img)
+
+exit_img = pygame.image.load("m_Exit-Button.png").convert_alpha()
+exit_btn = button.Button(x=420, y=410, image=exit_img)
 
 font = pygame.font.SysFont('serif', 48)
-name = font.render("Time_Killer", True, settings.RED)
+name = font.render("Time_Killer", True, parameters.RED)
 
 main_menu()
