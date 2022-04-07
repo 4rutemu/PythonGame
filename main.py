@@ -164,13 +164,13 @@ total_level_height = len(first_lvl) * platform.PLATFORM_HEIGHT  # высоту
 
 camera = cam.Camera(camera_configure, total_level_width, total_level_height)
 
-start_img = pygame.image.load("m_Start-Button.png").convert_alpha()
+start_img = pygame.image.load("Buttons_Pictures/m_Start-Button.png").convert_alpha()
 start_btn = button.Button(x=200, y=400, image=start_img)
 
-exit_img = pygame.image.load("m_Exit-Button.png").convert_alpha()
+exit_img = pygame.image.load("Buttons_Pictures/m_Exit-Button.png").convert_alpha()
 exit_btn = button.Button(x=420, y=410, image=exit_img)
 
-pause_img = pygame.image.load("m_Pause-Button.png").convert_alpha()
+pause_img = pygame.image.load("Buttons_Pictures/m_Pause-Button.png").convert_alpha()
 pause_btn = button.Button(x=200, y=410, image=pause_img)
 
 font = pygame.font.SysFont('serif', 48)

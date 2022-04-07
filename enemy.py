@@ -17,15 +17,13 @@ class Enemy(game_object.GameObject):
         # Так как враг будет перемещаться к игроку + для колизии
 
     def enemy_collide(self, dx, pf, stop_list):
-        for p, s in pf, stop_list:
+        for p in pf:
             if sprite.collide_rect(self, p):  # Проверяем на пересечение противника с платформой
                 if dx > 0:  # Если противник движется вправо, то запрещаем
                     self.rect.right = p.rect.left
-                    self.rect.right = s.rect.left
                     self.dx *= -1
                 if dx < 0:  # Если противник движется в лево, то запрещаем
                     self.rect.left = p.rect.right
-                    self.rect.left = s.rect.right
                     self.dx *= -1
 
         for s in stop_list:
