@@ -32,7 +32,7 @@ first_lvl = [
     "--------------------------------------------"]
 
 
-def draw_lvl(lvl):
+def draw_lvl(lvl, player):
     x = y = 0
     for row in lvl:
         for col in row:
@@ -47,7 +47,7 @@ def draw_lvl(lvl):
                 platform.stoppers.append(stop)
 
             elif col == "e":
-                enemyForList = enemy.Enemy(x, y)
+                enemyForList = enemy.Enemy(x, y, player)
                 parameters.all_sprites.add(enemyForList)
                 enemy.enemies.append(enemyForList)
 
@@ -58,12 +58,19 @@ def draw_lvl(lvl):
 
 def game():
     running = True
-    draw_lvl(first_lvl)
     player = hero.Player()
+    draw_lvl(first_lvl, player)
     parameters.all_sprites.add(player)
     while running:
-        pygame.display.set_caption("Time_Killer")
+        pygame.display.set_caption("Time_Killer " + "Killed: " + str(player.kill_score) + " HP: " + str(player.hp))
         clock.tick(parameters.FPS)
+        if len(enemy.enemies) == 0:
+            print("Враги убиты!")
+        if player.hp == 0:
+            running = False
+            delliting()
+            main_menu()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False

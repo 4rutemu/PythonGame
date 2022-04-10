@@ -12,8 +12,9 @@ speed_list = [-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7]
 
 # TODO: получение урона от атак
 class Enemy(game_object.GameObject):
-    def __init__(self, x, y):
+    def __init__(self, x, y, player):
         super().__init__(x, y, 20, 30, (255, 255, 0))
+        self.player = player
         self.dx = speed_list[random.randint(0, 13)]
         # Так как враг будет перемещаться к игроку + для колизии
 
@@ -28,7 +29,17 @@ class Enemy(game_object.GameObject):
                 if dx < 0:  # Если противник движется в лево, то запрещаем
                     self.rect.left = p.rect.right
                     self.dx *= -1
+        if sprite.collide_rect(self, self.player):
+            if self.dx > 0:
+                self.rect.right = self.player.rect.left
+                self.dx *= -1
+                self.player.hp -= 1
 
+            elif self.dx < 0:
+                self.rect.left = self.player.rect.right
+                self.dx *= -1
+                self.player.hp -= 1
+                
         for s in stop_list:
             if sprite.collide_rect(self, s):
                 if dx > 0:  # Если противник движется вправо, то запрещаем
@@ -48,4 +59,6 @@ class Enemy(game_object.GameObject):
         if self.hp <= 0:
             parameters.death_sound.play()
             self.rect.x = -600000
+            self.player.kill_score += 1
+            enemies.remove(self)
             self.kill()
