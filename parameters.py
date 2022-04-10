@@ -1,5 +1,9 @@
 import pygame
 
+pygame.mixer.init()
+player_attack_sound = pygame.mixer.Sound("player_attack_sound.wav")
+death_sound = pygame.mixer.Sound("death_sound.wav")
+
 WIDTH = 800
 HEIGHT = 600
 FPS = 45

@@ -3,6 +3,7 @@ import random
 from pygame import sprite
 
 import game_object
+import parameters
 import platform
 
 enemies = []
@@ -45,5 +46,6 @@ class Enemy(game_object.GameObject):
         self.moving(platform.platforms, platform.stoppers)
 
         if self.hp <= 0:
+            parameters.death_sound.play()
             self.rect.x = -50
             self.kill()
