@@ -56,8 +56,11 @@ def draw_lvl(lvl):
         x = 0  # на каждой новой строчке начинаем с нуля
 
 
-def game(player):
+def game():
     running = True
+    draw_lvl(first_lvl)
+    player = hero.Player()
+    parameters.all_sprites.add(player)
     while running:
         pygame.display.set_caption("Time_Killer")
         clock.tick(parameters.FPS)
@@ -106,6 +109,11 @@ def pause(player):
             delliting(player)
 
             main_menu()
+        elif pygame.key.get_pressed()[pygame.K_r]:
+            parameters.reload = True
+            paused = False
+            delliting(player)
+            game()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -123,10 +131,7 @@ def main_menu():
         screen.blit(name, (290, 300))
         if start_btn.draw(screen):
             running = False
-            draw_lvl(first_lvl)
-            player = hero.Player()
-            parameters.all_sprites.add(player)
-            game(player)
+            game()
         elif exit_btn.draw(screen):
             running = False
             pygame.quit()
