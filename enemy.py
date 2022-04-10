@@ -47,5 +47,5 @@ class Enemy(game_object.GameObject):
 
         if self.hp <= 0:
             parameters.death_sound.play()
-            self.rect.x = -50
+            self.rect.x = -600000
             self.kill()

@@ -106,7 +106,6 @@ class AttackSprite(game_object.GameObject):
             self.kill()
             self.player.is_attacking = False
 
-        from enemy import enemies
-        for enemy in enemies:
-            if sprite.collide_rect(enemy, self):
-                enemy.hp -= 1
+        for e in enemy.enemies:
+            if sprite.collide_rect(e, self):
+                e.hp -= 1
