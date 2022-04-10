@@ -16,6 +16,8 @@ class Enemy(game_object.GameObject):
         self.dx = speed_list[random.randint(0, 13)]
         # Так как враг будет перемещаться к игроку + для колизии
 
+        self.hp = 10
+
     def enemy_collide(self, dx, pf, stop_list):
         for p in pf:
             if sprite.collide_rect(self, p):  # Проверяем на пересечение противника с платформой
@@ -41,3 +43,7 @@ class Enemy(game_object.GameObject):
 
     def update(self):
         self.moving(platform.platforms, platform.stoppers)
+
+        if self.hp <= 0:
+            self.rect.x = -50
+            self.kill()

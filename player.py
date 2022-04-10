@@ -1,4 +1,3 @@
-
 import platform
 
 from pygame import sprite
@@ -105,3 +104,8 @@ class AttackSprite(game_object.GameObject):
         if (pygame.time.get_ticks() - self.creation_time) > parameters.ATTACK_TIME:
             self.kill()
             self.player.is_attacking = False
+
+        from enemy import enemies
+        for enemy in enemies:
+            if sprite.collide_rect(enemy, self):
+                enemy.hp -= 1
