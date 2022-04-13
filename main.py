@@ -32,7 +32,7 @@ first_lvl = [
     "--------------------------------------------"]
 
 
-def draw_lvl(lvl):
+def draw_lvl(lvl, player):
     x = y = 0
     for row in lvl:
         for col in row:
@@ -47,7 +47,7 @@ def draw_lvl(lvl):
                 platform.stoppers.append(stop)
 
             elif col == "e":
-                enemyForList = enemy.Enemy(x, y)
+                enemyForList = enemy.Enemy(x, y, player)
                 parameters.all_sprites.add(enemyForList)
                 enemy.enemies.append(enemyForList)
 
@@ -58,19 +58,26 @@ def draw_lvl(lvl):
 
 def game():
     running = True
-    draw_lvl(first_lvl)
     player = hero.Player()
+    draw_lvl(first_lvl, player)
     parameters.all_sprites.add(player)
     while running:
-        pygame.display.set_caption("Time_Killer")
+        pygame.display.set_caption("Time_Killer " + "Killed: " + str(player.kill_score) + " HP: " + str(player.hp))
         clock.tick(parameters.FPS)
+        if len(enemy.enemies) == 0:
+            print("Враги убиты!")
+        if player.hp == 0:
+            running = False
+            delliting()
+            main_menu()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    pause(player)
+                    pause()
 
         # Обновление
         parameters.all_sprites.update()
@@ -84,35 +91,30 @@ def game():
         pygame.display.flip()
 
 
-def delliting(player): # Функция для удаления
+def delliting(): # Функция для удаления
     for s in parameters.all_sprites:
+        s.rect.x = -600000
         s.kill()
-    for e in enemy.enemies:
-        e.kill()
-    for p in platform.platforms:
-        p.kill()
-    player.kill()
 
 
-def pause(player):
+def pause():
     paused = True
     while paused:
         pygame.display.set_caption("Paused")
         screen.fill(parameters.BLACK)
         screen.blit(pause_name, (350, 300))
+        screen.blit(restart_name, (350, 100))
 
         if pause_btn.draw(screen):
             paused = False
         elif exit_btn.draw(screen):
-            parameters.reload = True
             paused = False
-            delliting(player)
-
+            delliting()
             main_menu()
         elif pygame.key.get_pressed()[pygame.K_r]:
-            parameters.reload = True
             paused = False
-            delliting(player)
+            delliting()
+            parameters.all_sprites.empty()
             game()
 
         for event in pygame.event.get():
@@ -132,6 +134,7 @@ def main_menu():
         if start_btn.draw(screen):
             running = False
             game()
+            parameters.all_sprites.empty()
         elif exit_btn.draw(screen):
             running = False
             pygame.quit()
@@ -179,7 +182,9 @@ pause_img = pygame.image.load("Buttons_Pictures/m_Pause-Button.png").convert_alp
 pause_btn = button.Button(x=200, y=410, image=pause_img)
 
 font = pygame.font.SysFont('serif', 48)
+font1 = pygame.font.SysFont('serif', 24)
 name = font.render("Time_Killer", True, parameters.RED)
 pause_name = font.render("Pause", True, parameters.RED)
+restart_name = font1.render("R for restart", True, parameters.RED)
 
 main_menu()

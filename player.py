@@ -12,6 +12,8 @@ class Player(game_object.GameObject):
     def __init__(self):
         super().__init__(parameters.WIDTH / 2, parameters.HEIGHT / 2, 20, 30, parameters.GREEN)
 
+        self.kill_score = 0
+        self.hp = 20
         self.dy = 0
         self.dx = 0
         self.onGround = True
@@ -106,7 +108,6 @@ class AttackSprite(game_object.GameObject):
             self.kill()
             self.player.is_attacking = False
 
-        from enemy import enemies
-        for enemy in enemies:
-            if sprite.collide_rect(enemy, self):
-                enemy.hp -= 1
+        for e in enemy.enemies:
+            if sprite.collide_rect(e, self):
+                e.hp -= 1
