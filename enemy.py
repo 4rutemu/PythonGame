@@ -64,10 +64,12 @@ class Enemy(game_object.GameObject):
                 attack = AttackSprite(self.id, self.player)
                 parameters.all_sprites.add(attack)
                 self.attacked = True
+                self.is_attacking = True
         else:
+            self.is_attacking = False
             self.attacked = False
         if self.hp <= 0:
-            parameters.death_sound.play()
+            parameters.npc_damage.play()
             self.rect.x = -600000
             self.player.kill_score += 1
             #enemies.remove(self)

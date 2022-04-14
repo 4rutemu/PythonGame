@@ -42,9 +42,7 @@ class AttackSprite(game_object.GameObject):
         else:
             if self.player.rect.x >= e.enemies[self.owner].rect.x:
                 self.rect.x = e.enemies[self.owner].rect.x + e.enemies[self.owner].rect.width
-                e.enemies[self.owner].is_attacking = True
             elif self.player.rect.x <= e.enemies[self.owner].rect.x:
-                e.enemies[self.owner].is_attacking = True
                 self.rect.x = e.enemies[self.owner].rect.x - parameters.ATTACK_WIDTH
             self.rect.y = e.enemies[self.owner].rect.y
 

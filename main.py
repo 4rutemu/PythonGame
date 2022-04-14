@@ -67,6 +67,7 @@ def game():
         if player.kill_score == len(enemy.enemies):
             print("Враги убиты!")
         if player.hp == 0:
+            parameters.game_over_sound.play()
             running = False
             delliting()
             main_menu()
@@ -106,8 +107,10 @@ def pause():
         screen.blit(restart_name, (350, 100))
 
         if pause_btn.draw(screen):
+            parameters.select_sound.play()
             paused = False
         elif exit_btn.draw(screen):
+            parameters.select_sound.play()
             paused = False
             delliting()
             main_menu()
@@ -131,10 +134,12 @@ def main_menu():
         screen.fill(parameters.BLACK)
         screen.blit(name, (290, 300))
         if start_btn.draw(screen):
+            parameters.select_sound.play()
             running = False
             game()
             parameters.all_sprites.empty()
         elif exit_btn.draw(screen):
+            parameters.select_sound.play()
             running = False
             pygame.quit()
             quit()
