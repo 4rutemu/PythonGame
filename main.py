@@ -64,7 +64,7 @@ def game():
     while running:
         pygame.display.set_caption("Time_Killer " + "Killed: " + str(player.kill_score) + " HP: " + str(player.hp))
         clock.tick(parameters.FPS)
-        if len(enemy.enemies) == 0:
+        if player.kill_score == len(enemy.enemies):
             print("Враги убиты!")
         if player.hp == 0:
             running = False
