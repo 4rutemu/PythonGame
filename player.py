@@ -18,7 +18,6 @@ class Player(game_object.GameObject):
         self.dx = 0
         self.onGround = True
         self.looking_right = True
-        self.looking_down = False
         self.is_attacking = False
 
     def get_input(self, pf, enemies):
@@ -32,15 +31,13 @@ class Player(game_object.GameObject):
         if keys[pygame.K_a]:
             self.dx = -parameters.MOVE_SPEED
             self.looking_right = False
-        if keys[pygame.K_s]:
-            self.looking_down = True
         if not (keys[pygame.K_d] or keys[pygame.K_a]):
             self.dx = 0
         if not self.onGround:
             self.dy += parameters.GRAVITY
         if keys[pygame.K_SPACE] and not self.is_attacking:
             parameters.player_attack_sound.play()
-            attack = AttackSprite(self.looking_right, self.looking_down, player=self)
+            attack = AttackSprite(looking_right=self.looking_right, player=self)
             parameters.all_sprites.add(attack)
             self.is_attacking = True
 
@@ -86,7 +83,7 @@ class Player(game_object.GameObject):
 
 
 class AttackSprite(game_object.GameObject):
-    def __init__(self, looking_right, looking_down, player):
+    def __init__(self, looking_right, player):
         pygame.sprite.Sprite.__init__(self)
         self.player = player
         self.image = pygame.Surface((parameters.ATTACK_WIDTH, parameters.ATTACK_HEIGHT))
@@ -100,8 +97,6 @@ class AttackSprite(game_object.GameObject):
             self.rect.right = player.rect.left
             self.rect.top = player.rect.top
             self.creation_time = pygame.time.get_ticks()
-        if looking_down:  # Для удара снизу
-            pass
 
     def update(self):
         if (pygame.time.get_ticks() - self.creation_time) > parameters.ATTACK_TIME:

@@ -91,7 +91,7 @@ def game():
         pygame.display.flip()
 
 
-def delliting(): # Функция для удаления
+def delliting():  # Функция для удаления
     for s in parameters.all_sprites:
         s.rect.x = -600000
         s.kill()
@@ -125,7 +125,6 @@ def pause():
 
 
 def main_menu():
-
     running = True
     while running:
         pygame.display.set_caption("Main Menu")
