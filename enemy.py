@@ -9,18 +9,26 @@ from AttackSprite import AttackSprite
 
 enemies = []
 speed_list = [-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7]
+enemy_hp = [5, 10, 15, 20, 25]
+enemies_colour = [parameters.YELLOW, parameters.YELLOW, parameters.BLUE, parameters.RED, parameters.RED]
 
 
-# TODO: получение урона от атак
 class Enemy(game_object.GameObject):
     def __init__(self, x, y, player):
-        super().__init__(x, y, 20, 30, (255, 255, 0))
+        self.hp = enemy_hp[random.randint(0, 4)]
+        if self.hp == 5 or self.hp == 10:
+            self.colour = parameters.YELLOW
+        elif self.hp == 20 or self.hp == 25:
+            self.colour = parameters.RED
+        else:
+            self.colour = parameters.BLUE
+        super().__init__(x, y, 20, 30, colour=self.colour)
         self.player = player
         self.dx = speed_list[random.randint(0, 13)]
         # Так как враг будет перемещаться к игроку + для колизии
         self.attacked = False
         self.is_attacking = False
-        self.hp = 10
+
         self.id = len(enemies)
 
     def enemy_collide(self, dx, pf, stop_list):
@@ -59,7 +67,7 @@ class Enemy(game_object.GameObject):
 
         if self.rect.y == self.player.rect.y and ((abs(self.rect.x - self.player.rect.x + self.player.rect.width) < parameters.ATTACK_WIDTH) or (
                 abs(self.rect.x - self.player.rect.x - self.player.rect.width) < parameters.ATTACK_WIDTH)):
-            if not self.attacked and random.randint(1, 5) == 3:  # немного глупости чтобы не был непобедимым
+            if not self.attacked and random.randint(0, 4) == 3:  # немного глупости чтобы не был непобедимым
 
                 attack = AttackSprite(self.id, self.player)
                 parameters.all_sprites.add(attack)
@@ -72,5 +80,7 @@ class Enemy(game_object.GameObject):
             parameters.npc_damage.play()
             self.rect.x = -600000
             self.player.kill_score += 1
-            #enemies.remove(self)
+            print(parameters.MOVE_SPEED)
+            parameters.MOVE_SPEED += 0.5  # Для большей динамичности будет увеличиваться скорость передвижения после
+            # убийства противника
             self.kill()
