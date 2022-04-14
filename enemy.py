@@ -5,6 +5,7 @@ from pygame import sprite
 import game_object
 import parameters
 import platform
+from AttackSprite import AttackSprite
 
 enemies = []
 speed_list = [-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7]
@@ -17,8 +18,10 @@ class Enemy(game_object.GameObject):
         self.player = player
         self.dx = speed_list[random.randint(0, 13)]
         # Так как враг будет перемещаться к игроку + для колизии
-
+        self.attacked = False
+        self.is_attacking = False
         self.hp = 10
+        self.id = len(enemies)
 
     def enemy_collide(self, dx, pf, stop_list):
         for p in pf:
@@ -33,12 +36,10 @@ class Enemy(game_object.GameObject):
             if self.dx > 0:
                 self.rect.right = self.player.rect.left
                 self.dx *= -1
-                self.player.hp -= 1
 
             elif self.dx < 0:
                 self.rect.left = self.player.rect.right
                 self.dx *= -1
-                self.player.hp -= 1
                 
         for s in stop_list:
             if sprite.collide_rect(self, s):
@@ -56,9 +57,20 @@ class Enemy(game_object.GameObject):
     def update(self):
         self.moving(platform.platforms, platform.stoppers)
 
+        if self.rect.y == self.player.rect.y and ((abs(self.rect.x - self.player.rect.x + self.player.rect.width) < parameters.ATTACK_WIDTH) or (
+                abs(self.rect.x - self.player.rect.x - self.player.rect.width) < parameters.ATTACK_WIDTH)):
+            if not self.attacked and random.randint(1, 5) == 3:  # немного глупости чтобы не был непобедимым
+
+                attack = AttackSprite(self.id, self.player)
+                parameters.all_sprites.add(attack)
+                self.attacked = True
+                self.is_attacking = True
+        else:
+            self.is_attacking = False
+            self.attacked = False
         if self.hp <= 0:
-            parameters.death_sound.play()
+            parameters.npc_damage.play()
             self.rect.x = -600000
             self.player.kill_score += 1
-            enemies.remove(self)
+            #enemies.remove(self)
             self.kill()

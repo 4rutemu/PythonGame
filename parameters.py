@@ -2,7 +2,10 @@ import pygame
 
 pygame.mixer.init()
 player_attack_sound = pygame.mixer.Sound("Sounds/player_attack_sound.wav")
-death_sound = pygame.mixer.Sound("Sounds/death_sound.wav")
+# death_sound = pygame.mixer.Sound("Sounds/death_sound.wav")
+npc_damage = pygame.mixer.Sound("Sounds/get_damage_npc.wav")
+select_sound = pygame.mixer.Sound("Sounds/select_sound.wav")
+game_over_sound = pygame.mixer.Sound("Sounds/game_over.wav")
 
 WIDTH = 800
 HEIGHT = 600

@@ -64,9 +64,10 @@ def game():
     while running:
         pygame.display.set_caption("Time_Killer " + "Killed: " + str(player.kill_score) + " HP: " + str(player.hp))
         clock.tick(parameters.FPS)
-        if len(enemy.enemies) == 0:
+        if player.kill_score == len(enemy.enemies):
             print("Враги убиты!")
         if player.hp == 0:
+            parameters.game_over_sound.play()
             running = False
             delliting()
             main_menu()
@@ -91,7 +92,7 @@ def game():
         pygame.display.flip()
 
 
-def delliting(): # Функция для удаления
+def delliting():  # Функция для удаления
     for s in parameters.all_sprites:
         s.rect.x = -600000
         s.kill()
@@ -106,8 +107,10 @@ def pause():
         screen.blit(restart_name, (350, 100))
 
         if pause_btn.draw(screen):
+            parameters.select_sound.play()
             paused = False
         elif exit_btn.draw(screen):
+            parameters.select_sound.play()
             paused = False
             delliting()
             main_menu()
@@ -125,17 +128,18 @@ def pause():
 
 
 def main_menu():
-
     running = True
     while running:
         pygame.display.set_caption("Main Menu")
         screen.fill(parameters.BLACK)
         screen.blit(name, (290, 300))
         if start_btn.draw(screen):
+            parameters.select_sound.play()
             running = False
             game()
             parameters.all_sprites.empty()
         elif exit_btn.draw(screen):
+            parameters.select_sound.play()
             running = False
             pygame.quit()
             quit()
