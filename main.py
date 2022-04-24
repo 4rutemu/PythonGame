@@ -28,8 +28,36 @@ first_lvl = [
     "-               x    e -------      --------",
     "-                -------------      --------",
     "-                             ---          -",
-    "-x      e                     x           x-",
+    "-x      e                     x            -",
     "--------------------------------------------"]
+second_lvl = [
+    "----------------------------------------------------------------------------",
+    "-                                                                          -",
+    "-                                                                          -",
+    "-                                                                          -",
+    "-       -                                             xe       xxe   x     -",
+    "-      --         -                                    --------  ----      -",
+    "-     --- e      -                x e     x                                -",
+    "-       ----------                 -------                                 -",
+    "-                                                                          -",
+    "-                                                    x     e       x       -",
+    "-                     ---                             -------------        -",
+    "-                                                     -           ----     -",
+    "-                                                     -      x   e-    x  e-",
+    "-                                    ------           -       -----     ----",
+    "-        --------                         -----                   -        -",
+    "-        -       -                  xe           x   x   e   e    ----     -",
+    "-e       -                           ------------     -------------        -",
+    "----------------                  ---           -     -                    -",
+    "-                              ----             -     -               ---  -",
+    "-e                  x       ----                -     -                    -",
+    "--------------------  -------                                              -",
+    "-                                                               -----      -",
+    "-                                    ------                                -",
+    "-                                                                          -",
+    "-                x    e   -----                - e      -                  -",
+    "-     e            -------e                     --------                   -",
+    "----------------------------------------------------------------------------"]
 
 
 def draw_lvl(lvl, player):
@@ -59,14 +87,31 @@ def draw_lvl(lvl, player):
 def game():
     running = True
     player = hero.Player()
-    draw_lvl(first_lvl, player)
+    if parameters.default_lvl == 1:
+        draw_lvl(first_lvl, player)
+        total_level_width = len(first_lvl[0]) * platform.PLATFORM_WIDTH  # Высчитываем фактическую ширину уровня
+        total_level_height = len(first_lvl) * platform.PLATFORM_HEIGHT  # высоту
+        camera = cam.Camera(camera_configure, total_level_width, total_level_height)
+    else:
+        draw_lvl(second_lvl, player)
+        total_level_width = len(second_lvl[0]) * platform.PLATFORM_WIDTH  # Высчитываем фактическую ширину уровня
+        total_level_height = len(second_lvl) * platform.PLATFORM_HEIGHT  # высоту
+        camera = cam.Camera(camera_configure, total_level_width, total_level_height)
     parameters.all_sprites.add(player)
     while running:
         pygame.display.set_caption("Time_Killer " + "Killed: " + str(player.kill_score) + " HP: " + str(player.hp))
         clock.tick(parameters.FPS)
         if player.kill_score == len(enemy.enemies):
-            print("Враги убиты!")
-        if player.hp == 0:
+            parameters.default_lvl = 2
+            parameters.J_POWER += 1
+            parameters.ATTACK_POWER += 3
+            parameters.max_hp = 25
+            delliting()
+            parameters.all_sprites.empty()
+            pygame.display.flip()
+            running = False
+            game()
+        if player.hp <= 0:
             parameters.game_over_sound.play()
             running = False
             delliting()
@@ -96,6 +141,10 @@ def delliting():  # Функция для удаления
     for s in parameters.all_sprites:
         s.rect.x = -600000
         s.kill()
+    for p in platform.platforms:
+        p.remove()
+    for s in platform.stoppers:
+        s.remove()
 
 
 def pause():
@@ -170,11 +219,6 @@ pygame.init()
 # pygame.mixer.init()
 screen = pygame.display.set_mode((parameters.WIDTH, parameters.HEIGHT))
 clock = pygame.time.Clock()
-
-total_level_width = len(first_lvl[0]) * platform.PLATFORM_WIDTH  # Высчитываем фактическую ширину уровня
-total_level_height = len(first_lvl) * platform.PLATFORM_HEIGHT  # высоту
-
-camera = cam.Camera(camera_configure, total_level_width, total_level_height)
 
 start_img = pygame.image.load("Buttons_Pictures/m_Start-Button.png").convert_alpha()
 start_btn = button.Button(x=200, y=400, image=start_img)

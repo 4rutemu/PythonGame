@@ -14,7 +14,7 @@ class Player(game_object.GameObject):
         super().__init__(parameters.WIDTH / 2, parameters.HEIGHT / 2, 20, 30, parameters.GREEN)
 
         self.kill_score = 0
-        self.hp = 20
+        self.hp = parameters.max_hp
         self.dy = 0
         self.dx = 0
         self.onGround = True

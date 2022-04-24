@@ -19,11 +19,15 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
+max_hp = 20
 GRAVITY = 0.35
 J_POWER = 10
 MOVE_SPEED = 7
 ATTACK_TIME = 200
 ATTACK_WIDTH = 10
 ATTACK_HEIGHT = 30
+ATTACK_POWER = 1
+
+default_lvl = 1
 
 all_sprites = pygame.sprite.Group()
