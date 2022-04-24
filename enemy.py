@@ -10,8 +10,6 @@ from AttackSprite import AttackSprite
 enemies = []
 speed_list = [-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7]
 enemy_hp = [5, 10, 15, 20, 25]
-enemies_colour = [parameters.YELLOW, parameters.YELLOW, parameters.BLUE, parameters.RED, parameters.RED]
-
 
 class Enemy(game_object.GameObject):
     def __init__(self, x, y, player):

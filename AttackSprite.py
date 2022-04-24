@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from pygame import sprite
 
@@ -35,7 +37,7 @@ class AttackSprite(game_object.GameObject):
             if self.player.is_attacking:
                 for enemy in e.enemies:
                     if sprite.collide_rect(enemy, self):
-                        enemy.hp -= 1
+                        enemy.hp -= parameters.ATTACK_POWER
                         self.player.is_attacking = False
                         print(enemy.hp)
 
@@ -48,6 +50,6 @@ class AttackSprite(game_object.GameObject):
 
             if e.enemies[self.owner].is_attacking:
                 if sprite.collide_rect(self.player, self):
-                    self.player.hp -= 1
+                    self.player.hp -= random.randint(0, 3)
                     e.enemies[self.owner].is_attacking = False
                     print(self.player.hp)
