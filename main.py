@@ -10,26 +10,26 @@ import player as hero
 import cam
 
 first_lvl = [
-    "--------------------------------------------",
-    "-                                          -",
-    "-                                          -",
-    "-                          ----   e  x     -",
-    "-             --              -------      -",
-    "-                                          -",
-    "-x   e x x  e  x                           -",
-    "- -----   -----                            -",
-    "-                    ---                   -",
-    "-                                          -",
-    "-----   --------                    ---    -",
-    "-                                          -",
-    "-                             ---          -",
-    "----------------                           -",
-    "-                                  x      e-",
-    "-               x    e -------      --------",
-    "-                -------------      --------",
-    "-                             ---          -",
-    "-x      e                     x            -",
-    "--------------------------------------------"]
+    "++++++++++++++++++++++++++++++++++++++++++++",
+    "+                                          +",
+    "+                                          +",
+    "+                          ---   e  x      +",
+    "+             --              -------      +",
+    "+                                          +",
+    "+x   e x x  e  x                           +",
+    "+ -----   -----                            +",
+    "+                    ---                   +",
+    "+                                          +",
+    "+----   --------                    ---    +",
+    "+                                          +",
+    "+                             ---          +",
+    "+---------------                           +",
+    "+                                  x      e+",
+    "+               x    e -------      -------+",
+    "+                ------+++++++      ++++++++",
+    "+                             ---          +",
+    "+x      e                     x            +",
+    "+-------------------------------------------"]
 second_lvl = [
     "----------------------------------------------------------------------------",
     "-                                                                          -",
@@ -73,6 +73,12 @@ def draw_lvl(lvl, player):
             elif col == "x":
                 stop = platform.Platform(x, y)
                 platform.stoppers.append(stop)
+
+            elif col == "+":
+                pf = platform.Platform(x, y)
+                pf.image = pygame.image.load('Platforms images/edges.png').convert_alpha()
+                parameters.all_sprites.add(pf)
+                platform.platforms.append(pf)
 
             elif col == "e":
                 enemyForList = enemy.Enemy(x, y, player)
@@ -129,7 +135,7 @@ def game():
         parameters.all_sprites.update()
 
         # Отрисовка
-        screen.fill(parameters.BLACK)
+        screen.blit(background, (0, 0))
 
         camera.update(player)  # центризируем камеру относительно персонажа
         for s in parameters.all_sprites:
@@ -151,7 +157,7 @@ def pause():
     paused = True
     while paused:
         pygame.display.set_caption("Paused")
-        screen.fill(parameters.BLACK)
+        screen.blit(mainground, (0, 0))
         screen.blit(pause_name, (350, 300))
         screen.blit(restart_name, (350, 100))
 
@@ -180,7 +186,7 @@ def main_menu():
     running = True
     while running:
         pygame.display.set_caption("Main Menu")
-        screen.fill(parameters.BLACK)
+        screen.blit(mainground, (0, 0))
         screen.blit(name, (290, 300))
         if start_btn.draw(screen):
             parameters.select_sound.play()
@@ -219,6 +225,12 @@ pygame.init()
 # pygame.mixer.init()
 screen = pygame.display.set_mode((parameters.WIDTH, parameters.HEIGHT))
 clock = pygame.time.Clock()
+
+background = pygame.image.load('Backgrounds/background.png').convert_alpha()
+background = pygame.transform.scale(background, (parameters.WIDTH, parameters.HEIGHT))
+
+mainground = pygame.image.load('Backgrounds/main_background.png').convert_alpha()
+mainground = pygame.transform.scale(mainground, (parameters.WIDTH, parameters.HEIGHT))
 
 start_img = pygame.image.load("Buttons_Pictures/m_Start-Button.png").convert_alpha()
 start_btn = button.Button(x=200, y=400, image=start_img)
