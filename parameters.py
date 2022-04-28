@@ -30,4 +30,6 @@ based_attack_power = 1
 
 default_lvl = 1
 
+level_status = False
+
 all_sprites = pygame.sprite.Group()
