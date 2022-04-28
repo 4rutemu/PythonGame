@@ -13,7 +13,7 @@ first_lvl = [
     "++++++++++++++++++++++++++++++++++++++++++++",
     "+                                          +",
     "+                                          +",
-    "+                          ---   e  x      +",
+    "+                         ----   e  x      +",
     "+             --              -------      +",
     "+                                          +",
     "+x   e x x  e  x                           +",
@@ -109,9 +109,10 @@ def game():
         clock.tick(parameters.FPS)
         if player.kill_score == len(enemy.enemies):
             parameters.default_lvl = 2
-            parameters.J_POWER += 1
-            parameters.ATTACK_POWER += 3
-            parameters.max_hp = 25
+            parameters.based_j_power += 1
+            parameters.based_attack_power += 3
+            parameters.based_hp += 20
+            parameters.based_move_speed = player.move_speed
             delliting()
             parameters.all_sprites.empty()
             pygame.display.flip()
@@ -121,6 +122,7 @@ def game():
             parameters.game_over_sound.play()
             running = False
             delliting()
+            parameters.all_sprites.empty()
             main_menu()
 
         for event in pygame.event.get():
@@ -168,6 +170,7 @@ def pause():
             parameters.select_sound.play()
             paused = False
             delliting()
+            parameters.all_sprites.empty()
             main_menu()
         elif pygame.key.get_pressed()[pygame.K_r]:
             paused = False

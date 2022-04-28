@@ -11,6 +11,7 @@ enemies = []
 speed_list = [-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7]
 enemy_hp = [5, 10, 15, 20, 25]
 
+
 class Enemy(game_object.GameObject):
     def __init__(self, x, y, player):
         self.hp = enemy_hp[random.randint(0, 4)]
@@ -78,7 +79,7 @@ class Enemy(game_object.GameObject):
             parameters.npc_damage.play()
             self.rect.x = -600000
             self.player.kill_score += 1
-            print(parameters.MOVE_SPEED)
-            parameters.MOVE_SPEED += 0.5  # Для большей динамичности будет увеличиваться скорость передвижения после
+            print(self.player.move_speed)
+            self.player.move_speed += 0.5  # Для большей динамичности будет увеличиваться скорость передвижения после
             # убийства противника
             self.kill()
