@@ -37,7 +37,7 @@ class AttackSprite(game_object.GameObject):
             if self.player.is_attacking:
                 for enemy in e.enemies:
                     if sprite.collide_rect(enemy, self):
-                        enemy.hp -= parameters.ATTACK_POWER
+                        enemy.hp -= self.player.attack_power
                         self.player.is_attacking = False
                         print(enemy.hp)
 

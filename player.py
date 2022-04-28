@@ -14,7 +14,10 @@ class Player(game_object.GameObject):
         super().__init__(parameters.WIDTH / 2, parameters.HEIGHT / 2, 20, 30, parameters.GREEN)
 
         self.kill_score = 0
-        self.hp = parameters.max_hp
+        self.hp = parameters.based_hp
+        self.j_power = parameters.based_j_power
+        self.move_speed = parameters.based_move_speed
+        self.attack_power = parameters.based_attack_power
         self.dy = 0
         self.dx = 0
         self.onGround = True
@@ -25,12 +28,12 @@ class Player(game_object.GameObject):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
             if self.onGround:
-                self.dy = -parameters.J_POWER
+                self.dy = -self.j_power
         if keys[pygame.K_d]:
-            self.dx = parameters.MOVE_SPEED
+            self.dx = self.move_speed
             self.looking_right = True
         if keys[pygame.K_a]:
-            self.dx = -parameters.MOVE_SPEED
+            self.dx = -self.move_speed
             self.looking_right = False
         if not (keys[pygame.K_d] or keys[pygame.K_a]):
             self.dx = 0

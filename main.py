@@ -13,7 +13,7 @@ first_lvl = [
     "++++++++++++++++++++++++++++++++++++++++++++",
     "+                                          +",
     "+                                          +",
-    "+                          ---   e  x      +",
+    "+                         ----   e  x      +",
     "+             --              -------      +",
     "+                                          +",
     "+x   e x x  e  x                           +",
@@ -31,33 +31,33 @@ first_lvl = [
     "+x      e                     x            +",
     "+-------------------------------------------"]
 second_lvl = [
-    "----------------------------------------------------------------------------",
-    "-                                                                          -",
-    "-                                                                          -",
-    "-                                                                          -",
-    "-       -                                             xe       xxe   x     -",
-    "-      --         -                                    --------  ----      -",
-    "-     --- e      -                x e     x                                -",
-    "-       ----------                 -------                                 -",
-    "-                                                                          -",
-    "-                                                    x     e       x       -",
-    "-                     ---                             -------------        -",
-    "-                                                     -           ----     -",
-    "-                                                     -      x   e-    x  e-",
-    "-                                    ------           -       -----     ----",
-    "-        --------                         -----                   -        -",
-    "-        -       -                  xe           x   x   e   e    ----     -",
-    "-e       -                           ------------     -------------        -",
-    "----------------                  ---           -     -                    -",
-    "-                              ----             -     -               ---  -",
-    "-e                  x       ----                -     -                    -",
-    "--------------------  -------                                              -",
-    "-                                                               -----      -",
-    "-                                    ------                                -",
-    "-                                                                          -",
-    "-                x    e   -----                - e      -                  -",
-    "-     e            -------e                     --------                   -",
-    "----------------------------------------------------------------------------"]
+    "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
+    "+                                                                          +",
+    "+                                                                          +",
+    "+                                                                          +",
+    "+       -                                             xe       xxe   x     +",
+    "+      -+         -                                    --------  ----      +",
+    "+     -++ e      -                x e     x                                +",
+    "+       +--------+                 -------                                 +",
+    "+                                                                          +",
+    "+                                                    x     e       x       +",
+    "+                     ---                             -------------        +",
+    "+                                                     +           +---     +",
+    "+                                                     +      x   e+    x  e+",
+    "+                                    ------           +       ----+     ---+",
+    "+        --------                         +----                   +        +",
+    "+        +       -                  xe           x   x   e   e    +---     +",
+    "+e       +                           ------------     ------------+        +",
+    "+--------+------                  ---           +     +                    +",
+    "+                              ---+             +     +               ---  +",
+    "+e                  x       ---+                +     +                    +",
+    "+-------------------  ------+                                              +",
+    "+                                                               -----      +",
+    "+                                    ------                                +",
+    "+                                                                          +",
+    "+                x    e   -----                - e      -                  +",
+    "+     e            -------e                     --------                   +",
+    "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"]
 
 
 def draw_lvl(lvl, player):
@@ -98,29 +98,44 @@ def game():
         total_level_width = len(first_lvl[0]) * platform.PLATFORM_WIDTH  # Высчитываем фактическую ширину уровня
         total_level_height = len(first_lvl) * platform.PLATFORM_HEIGHT  # высоту
         camera = cam.Camera(camera_configure, total_level_width, total_level_height)
+        print(len(enemy.enemies))
     else:
         draw_lvl(second_lvl, player)
         total_level_width = len(second_lvl[0]) * platform.PLATFORM_WIDTH  # Высчитываем фактическую ширину уровня
         total_level_height = len(second_lvl) * platform.PLATFORM_HEIGHT  # высоту
         camera = cam.Camera(camera_configure, total_level_width, total_level_height)
+        parameters.level_status = True
+        print(len(enemy.enemies))
     parameters.all_sprites.add(player)
     while running:
         pygame.display.set_caption("Time_Killer " + "Killed: " + str(player.kill_score) + " HP: " + str(player.hp))
         clock.tick(parameters.FPS)
         if player.kill_score == len(enemy.enemies):
+            if parameters.level_status:
+                parameters.game_over_sound.play()
+                running = False
+                parameters.default_lvl = 1
+                parameters.level_status = False
+                delliting()
+                parameters.all_sprites.empty()
+                main_menu()
+
             parameters.default_lvl = 2
-            parameters.J_POWER += 1
-            parameters.ATTACK_POWER += 3
-            parameters.max_hp = 25
+            parameters.based_j_power += 1
+            parameters.based_attack_power += 3
+            parameters.based_hp += 20
+            parameters.based_move_speed = player.move_speed
             delliting()
             parameters.all_sprites.empty()
             pygame.display.flip()
             running = False
             game()
+
         if player.hp <= 0:
             parameters.game_over_sound.play()
             running = False
             delliting()
+            parameters.all_sprites.empty()
             main_menu()
 
         for event in pygame.event.get():
@@ -147,10 +162,10 @@ def delliting():  # Функция для удаления
     for s in parameters.all_sprites:
         s.rect.x = -600000
         s.kill()
-    for p in platform.platforms:
-        p.remove()
-    for s in platform.stoppers:
-        s.remove()
+    platform.platforms.clear()
+    platform.stoppers.clear()
+    enemy.enemies.clear()
+    print(len(enemy.enemies))
 
 
 def pause():
@@ -168,6 +183,7 @@ def pause():
             parameters.select_sound.play()
             paused = False
             delliting()
+            parameters.all_sprites.empty()
             main_menu()
         elif pygame.key.get_pressed()[pygame.K_r]:
             paused = False
