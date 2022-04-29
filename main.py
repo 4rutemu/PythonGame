@@ -6,6 +6,7 @@ import button
 import platform
 import enemy
 import parameters
+import player
 import player as hero
 import cam
 
@@ -67,21 +68,21 @@ def draw_lvl(lvl, player):
             if col == "":  # Пропускаем пустые символы, чтобы не тратить лишнее время
                 continue
             elif col == "-":
-                pf = platform.Platform(x, y)
+                pf = platform.Platform(x=x, y=y)
                 parameters.all_sprites.add(pf)
                 platform.platforms.append(pf)
             elif col == "x":
-                stop = platform.Platform(x, y)
+                stop = platform.Platform(x=x, y=y)
                 platform.stoppers.append(stop)
 
             elif col == "+":
-                pf = platform.Platform(x, y)
+                pf = platform.Platform(x=x, y=y)
                 pf.image = pygame.image.load('Platforms images/edges.png').convert_alpha()
                 parameters.all_sprites.add(pf)
                 platform.platforms.append(pf)
 
             elif col == "e":
-                enemyForList = enemy.Enemy(x, y, player)
+                enemyForList = enemy.Enemy(x=x, y=y, player=player)
                 parameters.all_sprites.add(enemyForList)
                 enemy.enemies.append(enemyForList)
 
@@ -94,18 +95,16 @@ def game():
     running = True
     player = hero.Player()
     if parameters.default_lvl == 1:
-        draw_lvl(first_lvl, player)
+        draw_lvl(lvl=first_lvl, player=player)
         total_level_width = len(first_lvl[0]) * platform.PLATFORM_WIDTH  # Высчитываем фактическую ширину уровня
         total_level_height = len(first_lvl) * platform.PLATFORM_HEIGHT  # высоту
         camera = cam.Camera(camera_configure, total_level_width, total_level_height)
-        print(len(enemy.enemies))
     else:
-        draw_lvl(second_lvl, player)
+        draw_lvl(lvl=second_lvl, player=player)
         total_level_width = len(second_lvl[0]) * platform.PLATFORM_WIDTH  # Высчитываем фактическую ширину уровня
         total_level_height = len(second_lvl) * platform.PLATFORM_HEIGHT  # высоту
         camera = cam.Camera(camera_configure, total_level_width, total_level_height)
         parameters.level_status = True
-        print(len(enemy.enemies))
     parameters.all_sprites.add(player)
     while running:
         pygame.display.set_caption("Time_Killer " + "Killed: " + str(player.kill_score) + " HP: " + str(player.hp))
@@ -123,7 +122,7 @@ def game():
             parameters.default_lvl = 2
             parameters.based_j_power += 1
             parameters.based_attack_power += 3
-            parameters.based_hp += 20
+            parameters.based_hp += 10
             parameters.based_move_speed = player.move_speed
             delliting()
             parameters.all_sprites.empty()
@@ -145,14 +144,20 @@ def game():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pause()
+                if event.key == pygame.K_c:
+                    characteristics(speed=player.move_speed, hp=player.hp,
+                                    jump_power=player.j_power, damage=player.attack_power)
 
         # Обновление
         parameters.all_sprites.update()
 
         # Отрисовка
-        screen.blit(background, (0, 0))
+        if parameters.default_lvl == 1:
+            screen.blit(background, (0, 0))
+        elif parameters.default_lvl == 2:
+            screen.blit(second_background, (0, 0))
 
-        camera.update(player)  # центризируем камеру относительно персонажа
+        camera.update(player)  # центрируем камеру относительно персонажа
         for s in parameters.all_sprites:
             screen.blit(s.image, camera.apply(s))
         pygame.display.flip()
@@ -165,14 +170,13 @@ def delliting():  # Функция для удаления
     platform.platforms.clear()
     platform.stoppers.clear()
     enemy.enemies.clear()
-    print(len(enemy.enemies))
 
 
 def pause():
     paused = True
     while paused:
         pygame.display.set_caption("Paused")
-        screen.blit(mainground, (0, 0))
+        screen.blit(main_background, (0, 0))
         screen.blit(pause_name, (350, 300))
         screen.blit(restart_name, (350, 100))
 
@@ -195,6 +199,34 @@ def pause():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+
+        pygame.display.flip()
+
+
+def characteristics(speed, hp, jump_power, damage):
+    running = True
+    speed_stat = font1.render("Current Speed: " + str(speed), True, parameters.WHITE)
+    hp_stat = font1.render("Current HP: " + str(hp), True, parameters.WHITE)
+    damage_stat = font1.render("Current Damage: " + str(damage), True, parameters.WHITE)
+    jump_stat = font1.render("Current Jump: " + str(jump_power), True, parameters.WHITE)
+    exit_name = font1.render("C for exit", True, parameters.RED)
+    while running:
+        pygame.display.set_caption("Characteristics")
+        screen.blit(main_background, (0, 0))
+        screen.blit(exit_name, (350, 10))
+        screen.blit(hp_stat, (330, 200))
+        screen.blit(speed_stat, (330, 240))
+        screen.blit(damage_stat, (330, 280))
+        screen.blit(jump_stat, (330, 320))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_c:
+                    running = False
+
         pygame.display.flip()
 
 
@@ -202,8 +234,8 @@ def main_menu():
     running = True
     while running:
         pygame.display.set_caption("Main Menu")
-        screen.blit(mainground, (0, 0))
-        screen.blit(name, (290, 300))
+        screen.blit(main_background, (0, 0))
+        screen.blit(name, (290, 200))
         if start_btn.draw(screen):
             parameters.select_sound.play()
             running = False
@@ -245,14 +277,17 @@ clock = pygame.time.Clock()
 background = pygame.image.load('Backgrounds/background.png').convert_alpha()
 background = pygame.transform.scale(background, (parameters.WIDTH, parameters.HEIGHT))
 
-mainground = pygame.image.load('Backgrounds/main_background.png').convert_alpha()
-mainground = pygame.transform.scale(mainground, (parameters.WIDTH, parameters.HEIGHT))
+main_background = pygame.image.load('Backgrounds/main_background.png').convert_alpha()
+main_background = pygame.transform.scale(main_background, (parameters.WIDTH, parameters.HEIGHT))
+
+second_background = pygame.image.load('Backgrounds/second_background.png').convert_alpha()
+second_background = pygame.transform.scale(second_background, (parameters.WIDTH, parameters.HEIGHT))
 
 start_img = pygame.image.load("Buttons_Pictures/m_Start-Button.png").convert_alpha()
-start_btn = button.Button(x=200, y=400, image=start_img)
+start_btn = button.Button(x=300, y=250, image=start_img)
 
 exit_img = pygame.image.load("Buttons_Pictures/m_Exit-Button.png").convert_alpha()
-exit_btn = button.Button(x=420, y=410, image=exit_img)
+exit_btn = button.Button(x=328, y=350, image=exit_img)
 
 pause_img = pygame.image.load("Buttons_Pictures/m_Pause-Button.png").convert_alpha()
 pause_btn = button.Button(x=200, y=410, image=pause_img)

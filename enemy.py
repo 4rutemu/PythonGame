@@ -21,7 +21,7 @@ class Enemy(game_object.GameObject):
             self.colour = parameters.RED
         else:
             self.colour = parameters.BLUE
-        super().__init__(x, y, 20, 30, colour=self.colour)
+        super().__init__(x=x, y=y, width=20, height=30, colour=self.colour)
         self.player = player
         self.dx = speed_list[random.randint(0, 13)]
         # Так как враг будет перемещаться к игроку + для колизии
@@ -59,16 +59,16 @@ class Enemy(game_object.GameObject):
 
     def moving(self, pf, stop_list):  # Функция с перемещением противника
         self.rect.x += self.dx
-        self.enemy_collide(self.dx, pf, stop_list)
+        self.enemy_collide(dx=self.dx, pf=pf, stop_list=stop_list)
 
     def update(self):
-        self.moving(platform.platforms, platform.stoppers)
+        self.moving(pf=platform.platforms, stop_list=platform.stoppers)
 
         if self.rect.y == self.player.rect.y and ((abs(self.rect.x - self.player.rect.x + self.player.rect.width) < parameters.ATTACK_WIDTH) or (
                 abs(self.rect.x - self.player.rect.x - self.player.rect.width) < parameters.ATTACK_WIDTH)):
             if not self.attacked and random.randint(0, 4) == 3:  # немного глупости чтобы не был непобедимым
 
-                attack = AttackSprite(self.id, self.player)
+                attack = AttackSprite(owner=self.id, player=self.player)
                 parameters.all_sprites.add(attack)
                 self.attacked = True
                 self.is_attacking = True
@@ -79,7 +79,6 @@ class Enemy(game_object.GameObject):
             parameters.npc_damage.play()
             self.rect.x = -600000
             self.player.kill_score += 1
-            print(self.player.move_speed)
             self.player.move_speed += 0.5  # Для большей динамичности будет увеличиваться скорость передвижения после
             # убийства противника
             self.kill()

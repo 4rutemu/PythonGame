@@ -11,7 +11,8 @@ import AttackSprite
 
 class Player(game_object.GameObject):
     def __init__(self):
-        super().__init__(parameters.WIDTH / 2, parameters.HEIGHT / 2, 20, 30, parameters.GREEN)
+        super().__init__(x=parameters.WIDTH / 2, y=parameters.HEIGHT / 2, width=20,
+                         height=30, colour=parameters.GREEN)
 
         self.kill_score = 0
         self.hp = parameters.based_hp
@@ -83,6 +84,6 @@ class Player(game_object.GameObject):
                     self.dy = 0
 
     def update(self):
-        self.get_input(platform.platforms, enemy.enemies)
+        self.get_input(pf=platform.platforms, enemies=enemy.enemies)
 
 
