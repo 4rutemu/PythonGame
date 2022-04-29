@@ -39,7 +39,6 @@ class AttackSprite(game_object.GameObject):
                     if sprite.collide_rect(enemy, self):
                         enemy.hp -= self.player.attack_power
                         self.player.is_attacking = False
-                        print(enemy.hp)
 
         else:
             if self.player.rect.x >= e.enemies[self.owner].rect.x:
@@ -52,4 +51,3 @@ class AttackSprite(game_object.GameObject):
                 if sprite.collide_rect(self.player, self):
                     self.player.hp -= random.randint(0, 3)
                     e.enemies[self.owner].is_attacking = False
-                    print(self.player.hp)

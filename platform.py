@@ -13,5 +13,5 @@ platforms = []
 
 class Platform(game_object.GameObject):
     def __init__(self, x, y):
-        super().__init__(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOUR)
+        super().__init__(x=x, y=y, width=PLATFORM_WIDTH, height=PLATFORM_HEIGHT, colour=PLATFORM_COLOUR)
         self.image = pygame.image.load("Platforms images/center.png").convert_alpha()
