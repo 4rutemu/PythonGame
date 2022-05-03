@@ -95,6 +95,7 @@ def game():
     running = True
     player = hero.Player()
     if parameters.default_lvl == 1:
+        parameters.moon_forest.play(100)
         draw_lvl(lvl=first_lvl, player=player)
         total_level_width = len(first_lvl[0]) * platform.PLATFORM_WIDTH  # Высчитываем фактическую ширину уровня
         total_level_height = len(first_lvl) * platform.PLATFORM_HEIGHT  # высоту
@@ -177,13 +178,14 @@ def pause():
     while paused:
         pygame.display.set_caption("Paused")
         screen.blit(main_background, (0, 0))
-        screen.blit(pause_name, (350, 300))
+        screen.blit(pause_name, (350, 150))
         screen.blit(restart_name, (350, 100))
 
         if pause_btn.draw(screen):
             parameters.select_sound.play()
             paused = False
         elif exit_btn.draw(screen):
+            parameters.moon_forest.stop()
             parameters.select_sound.play()
             paused = False
             delliting()
@@ -191,6 +193,7 @@ def pause():
             main_menu()
         elif pygame.key.get_pressed()[pygame.K_r]:
             paused = False
+            parameters.moon_forest.stop()
             delliting()
             parameters.all_sprites.empty()
             game()
@@ -230,22 +233,57 @@ def characteristics(speed, hp, jump_power, damage):
         pygame.display.flip()
 
 
-def main_menu():
+def select():
     running = True
     while running:
-        pygame.display.set_caption("Main Menu")
+        pygame.display.set_caption("Select Level")
         screen.blit(main_background, (0, 0))
-        screen.blit(name, (290, 200))
         if start_btn.draw(screen):
             parameters.select_sound.play()
+            parameters.default_lvl = 1
             running = False
             game()
             parameters.all_sprites.empty()
         elif exit_btn.draw(screen):
             parameters.select_sound.play()
+            parameters.default_lvl = 2
+            running = False
+            game()
+            parameters.all_sprites.empty()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        pygame.display.flip()
+
+
+def main_menu():
+    running = True
+    parameters.title.play(loops=100)
+    while running:
+
+        pygame.display.set_caption("Main Menu")
+        screen.blit(main_background, (0, 0))
+        screen.blit(name, (290, 200))
+        if start_btn.draw(screen):
+            parameters.title.stop()
+            parameters.select_sound.play()
+            running = False
+            game()
+            parameters.all_sprites.empty()
+        elif exit_btn.draw(screen):
+            parameters.title.stop()
+            parameters.select_sound.play()
             running = False
             pygame.quit()
             quit()
+        elif first_btn.draw(screen):
+            parameters.title.stop()
+            parameters.select_sound.play()
+            running = False
+            select()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -290,7 +328,10 @@ exit_img = pygame.image.load("Buttons_Pictures/m_Exit-Button.png").convert_alpha
 exit_btn = button.Button(x=328, y=350, image=exit_img)
 
 pause_img = pygame.image.load("Buttons_Pictures/m_Pause-Button.png").convert_alpha()
-pause_btn = button.Button(x=200, y=410, image=pause_img)
+pause_btn = button.Button(x=300, y=250, image=pause_img)
+
+first_img = pygame.image.load("Buttons_Pictures/frist.png").convert_alpha()
+first_btn = button.Button(x=300, y=450, image=first_img)
 
 font = pygame.font.SysFont('serif', 48)
 font1 = pygame.font.SysFont('serif', 24)

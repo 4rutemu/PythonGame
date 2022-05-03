@@ -7,6 +7,9 @@ npc_damage = pygame.mixer.Sound("Sounds/get_damage_npc.wav")
 select_sound = pygame.mixer.Sound("Sounds/select_sound.wav")
 game_over_sound = pygame.mixer.Sound("Sounds/game_over.wav")
 
+title = pygame.mixer.Sound("music/title.wav")
+moon_forest = pygame.mixer.Sound("music/moon-forest.wav")
+
 WIDTH = 800
 HEIGHT = 600
 FPS = 45
