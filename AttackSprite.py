@@ -27,7 +27,6 @@ class AttackSprite(game_object.GameObject):
             return
 
         if self.owner == 'player':
-
             if self.player.looking_right:
                 self.rect.left = self.player.rect.right
                 self.rect.top = self.player.rect.top
