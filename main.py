@@ -11,26 +11,26 @@ import player as hero
 import cam
 
 first_lvl = [
-    "++++++++++++++++++++++++++++++++++++++++++++",
-    "+                                          +",
-    "+                                          +",
-    "+                         ----   e  x      +",
-    "+             --              -------      +",
-    "+                                          +",
-    "+x   e x x  e  x                           +",
-    "+ -----   -----                            +",
-    "+                    ---                   +",
-    "+                                          +",
-    "+----   --------                    ---    +",
-    "+                                          +",
-    "+                             ---          +",
-    "+---------------                           +",
-    "+                                  x      e+",
-    "+               x    e -------      -------+",
-    "+                ------+++++++      ++++++++",
-    "+                             ---          +",
-    "+x      e                     x            +",
-    "+-------------------------------------------"]
+    "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
+    "+                                                                                                 +",
+    "+                                                                                                 +",
+    "+                         ----   e   x                       x e     x       -                    +",
+    "+             --              -------                        ---------       +                    +",
+    "+                                                                            +   e  x             +",
+    "+x   e x x  e  x                                                             +------              +",
+    "+ -----   -----                                    -------                         +              +",
+    "+                    ---                                                           +---           +",
+    "+                                            ---                                                  +",
+    "+----   --------                    ---                                           x  e       x    +",
+    "+                                                                                  ----------     +",
+    "+                             ---                           --------                              +",
+    "+---------------                                                                          -----   +",
+    "+                                  x      ex                                                      +",
+    "+               x    e -------      -------                                     ----              +",
+    "+                ------+++++++      +++++++              x     e  x                            ---+",
+    "+                             ---                         --------                                +",
+    "+x      e                                         e-------+ e    e                                +",
+    "+--------------------------------------------------++++++++---------------------------------------+"]
 second_lvl = [
     "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
     "+                                                                          +",
@@ -58,7 +58,7 @@ second_lvl = [
     "+                                                                          +",
     "+                x    e   -----                - e      -                  +",
     "+     e            -------e                     --------                   +",
-    "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"]
+    "-------------------+++++++----------------------++++++++--------------------"]
 
 
 def draw_lvl(lvl, player):
@@ -120,6 +120,7 @@ def game():
                 parameters.all_sprites.empty()
                 main_menu()
 
+            parameters.moon_forest.stop()
             parameters.default_lvl = 2
             parameters.based_j_power += 1
             parameters.based_attack_power += 3
@@ -132,6 +133,7 @@ def game():
             game()
 
         if player.hp <= 0:
+            parameters.moon_forest.stop()
             parameters.game_over_sound.play()
             running = False
             delliting()
@@ -247,6 +249,10 @@ def select():
         elif exit_btn.draw(screen):
             parameters.select_sound.play()
             parameters.default_lvl = 2
+            parameters.based_j_power = 11
+            parameters.based_attack_power = 4
+            parameters.based_hp = 40
+            parameters.based_move_speed = 7
             running = False
             game()
             parameters.all_sprites.empty()

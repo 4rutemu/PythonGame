@@ -41,7 +41,7 @@ class Player(game_object.GameObject):
         if not self.onGround:
             self.dy += parameters.GRAVITY
         if keys[pygame.K_SPACE] and not self.is_attacking:
-            parameters.player_attack_sound.play()
+            parameters.player_attack_sound.play(maxtime=1000)
             attack = AttackSprite.AttackSprite(owner='player', player=self)
             parameters.all_sprites.add(attack)
             self.is_attacking = True
