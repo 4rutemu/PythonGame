@@ -9,6 +9,7 @@ game_over_sound = pygame.mixer.Sound("Sounds/game_over.wav")
 
 title = pygame.mixer.Sound("music/title.wav")
 moon_forest = pygame.mixer.Sound("music/moon-forest.wav")
+village = pygame.mixer.Sound("music/village.wav")
 
 WIDTH = 800
 HEIGHT = 600
