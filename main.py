@@ -180,13 +180,13 @@ def pause():
     while paused:
         pygame.display.set_caption("Paused")
         screen.blit(main_background, (0, 0))
-        screen.blit(pause_name, (350, 150))
+        screen.blit(paused_img, (250, 150))
         screen.blit(restart_name, (350, 100))
 
-        if pause_btn.draw(screen):
+        if resume_btn.draw(screen):
             parameters.select_sound.play()
             paused = False
-        elif exit_btn.draw(screen):
+        elif pause_exit_btn.draw(screen):
             parameters.moon_forest.stop()
             parameters.select_sound.play()
             paused = False
@@ -240,13 +240,13 @@ def select():
     while running:
         pygame.display.set_caption("Select Level")
         screen.blit(main_background, (0, 0))
-        if start_btn.draw(screen):
+        if first_btn.draw(screen):
             parameters.select_sound.play()
             parameters.default_lvl = 1
             running = False
             game()
             parameters.all_sprites.empty()
-        elif exit_btn.draw(screen):
+        elif second_btn.draw(screen):
             parameters.select_sound.play()
             parameters.default_lvl = 2
             parameters.based_j_power = 11
@@ -269,7 +269,6 @@ def main_menu():
     running = True
     parameters.title.play(loops=100)
     while running:
-
         pygame.display.set_caption("Main Menu")
         screen.blit(main_background, (0, 0))
         screen.blit(name, (290, 200))
@@ -285,7 +284,7 @@ def main_menu():
             running = False
             pygame.quit()
             quit()
-        elif first_btn.draw(screen):
+        elif select_btn.draw(screen):
             parameters.title.stop()
             parameters.select_sound.play()
             running = False
@@ -327,22 +326,31 @@ main_background = pygame.transform.scale(main_background, (parameters.WIDTH, par
 second_background = pygame.image.load('Backgrounds/second_background.png').convert_alpha()
 second_background = pygame.transform.scale(second_background, (parameters.WIDTH, parameters.HEIGHT))
 
-start_img = pygame.image.load("Buttons_Pictures/m_Start-Button.png").convert_alpha()
-start_btn = button.Button(x=300, y=250, image=start_img)
+# Для главного меню
+start_img = pygame.image.load("Buttons_Pictures/start_btn.png").convert_alpha()
+start_btn = button.Button(x=0, y=250, image=start_img)
+exit_img = pygame.image.load("Buttons_Pictures/exit_btn.png").convert_alpha()
+exit_btn = button.Button(x=0, y=450, image=exit_img)
+select_img = pygame.image.load("Buttons_Pictures/select_btn.png").convert_alpha()
+select_btn = button.Button(x=0, y=350, image=select_img)
 
-exit_img = pygame.image.load("Buttons_Pictures/m_Exit-Button.png").convert_alpha()
-exit_btn = button.Button(x=328, y=350, image=exit_img)
+# Для меню паузы
+resume_img = pygame.image.load("Buttons_Pictures/resume_btn.png").convert_alpha()
+resume_btn = button.Button(x=300, y=250, image=resume_img)
+pause_exit_img = pygame.image.load("Buttons_Pictures/exit_btn.png").convert_alpha()
+pause_exit_btn = button.Button(x=300, y=350, image=pause_exit_img)
+paused_img = pygame.image.load("Buttons_Pictures/paused.png").convert_alpha()
 
-pause_img = pygame.image.load("Buttons_Pictures/m_Pause-Button.png").convert_alpha()
-pause_btn = button.Button(x=300, y=250, image=pause_img)
+# Кнопки для меню выбора уровня
+first_img = pygame.image.load("Buttons_Pictures/first_btn.png").convert_alpha()
+first_btn = button.Button(x=300, y=200, image=first_img)
+second_img = pygame.image.load("Buttons_Pictures/second_btn.png").convert_alpha()
+second_btn = button.Button(x=300, y=300, image=second_img)
 
-first_img = pygame.image.load("Buttons_Pictures/frist.png").convert_alpha()
-first_btn = button.Button(x=300, y=450, image=first_img)
 
 font = pygame.font.SysFont('serif', 48)
 font1 = pygame.font.SysFont('serif', 24)
 name = font.render("Time_Killer", True, parameters.RED)
-pause_name = font.render("Pause", True, parameters.RED)
 restart_name = font1.render("R for restart", True, parameters.RED)
 
 main_menu()
