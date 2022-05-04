@@ -297,10 +297,16 @@ def select():
 def main_menu():
     running = True
     parameters.title.play(loops=100)
+    character_info = font1.render("C for Characteristics", True, parameters.RED)
+    pause_info = font1.render("ESC for Pause", True, parameters.RED)
+
     while running:
         pygame.display.set_caption("Main Menu")
         screen.blit(main_background, (0, 0))
         screen.blit(name, (290, 200))
+        screen.blit(character_info, (550, 450))
+        screen.blit(pause_info, (550, 480))
+
         if start_btn.draw(screen):
             parameters.title.stop()
             parameters.select_sound.play()
