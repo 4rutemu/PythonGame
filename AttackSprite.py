@@ -16,11 +16,8 @@ class AttackSprite(game_object.GameObject):
         super().__init__(x=-50, y=0, width=parameters.ATTACK_WIDTH, height=parameters.ATTACK_HEIGHT,
                          colour=parameters.RED)
         self.creation_time = pygame.time.get_ticks()
-        if player.looking_right:
-            self.image = parameters.right_attack_image
-        else:
-            self.image = parameters.left_attack_image
-            
+
+
     def update(self):
 
         if (pygame.time.get_ticks() - self.creation_time) > parameters.ATTACK_TIME:
@@ -34,9 +31,11 @@ class AttackSprite(game_object.GameObject):
             if self.player.looking_right:
                 self.rect.left = self.player.rect.right
                 self.rect.top = self.player.rect.top
+                self.image = parameters.right_attack_image
             else:
                 self.rect.right = self.player.rect.left
                 self.rect.top = self.player.rect.top
+                self.image = parameters.left_attack_image
             if self.player.is_attacking:
                 for enemy in e.enemies:
                     if sprite.collide_rect(enemy, self):
