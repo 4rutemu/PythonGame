@@ -93,24 +93,25 @@ def draw_lvl(lvl, player):
 
 def game():
     running = True
-    player = hero.Player()
+    Player = hero.Player()
     if parameters.default_lvl == 1:
         parameters.moon_forest.play(100)
-        draw_lvl(lvl=first_lvl, player=player)
+        draw_lvl(lvl=first_lvl, player=Player)
         total_level_width = len(first_lvl[0]) * platform.PLATFORM_WIDTH  # Высчитываем фактическую ширину уровня
         total_level_height = len(first_lvl) * platform.PLATFORM_HEIGHT  # высоту
         camera = cam.Camera(camera_configure, total_level_width, total_level_height)
     else:
-        draw_lvl(lvl=second_lvl, player=player)
+        parameters.village.play(100)
+        draw_lvl(lvl=second_lvl, player=Player)
         total_level_width = len(second_lvl[0]) * platform.PLATFORM_WIDTH  # Высчитываем фактическую ширину уровня
         total_level_height = len(second_lvl) * platform.PLATFORM_HEIGHT  # высоту
         camera = cam.Camera(camera_configure, total_level_width, total_level_height)
         parameters.level_status = True
-    parameters.all_sprites.add(player)
+    parameters.all_sprites.add(Player)
     while running:
-        pygame.display.set_caption("Time_Killer " + "Killed: " + str(player.kill_score) + " HP: " + str(player.hp))
+        pygame.display.set_caption("Time_Killer " + "Killed: " + str(Player.kill_score) + " HP: " + str(Player.hp))
         clock.tick(parameters.FPS)
-        if player.kill_score == len(enemy.enemies):
+        if Player.kill_score == len(enemy.enemies):
             if parameters.level_status:
                 parameters.game_over_sound.play()
                 running = False
@@ -121,24 +122,26 @@ def game():
                 main_menu()
 
             parameters.moon_forest.stop()
+            parameters.village.stop()
             parameters.default_lvl = 2
             parameters.based_j_power += 1
             parameters.based_attack_power += 3
             parameters.based_hp += 10
-            parameters.based_move_speed = player.move_speed
+            parameters.based_move_speed = Player.move_speed
             delliting()
             parameters.all_sprites.empty()
             pygame.display.flip()
             running = False
             game()
 
-        if player.hp <= 0:
+        if Player.hp <= 0:
             parameters.moon_forest.stop()
+            parameters.village.stop()
             parameters.game_over_sound.play()
             running = False
             delliting()
             parameters.all_sprites.empty()
-            main_menu()
+            game_over()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -148,8 +151,8 @@ def game():
                 if event.key == pygame.K_ESCAPE:
                     pause()
                 if event.key == pygame.K_c:
-                    characteristics(speed=player.move_speed, hp=player.hp,
-                                    jump_power=player.j_power, damage=player.attack_power)
+                    characteristics(speed=Player.move_speed, hp=Player.hp,
+                                    jump_power=Player.j_power, damage=Player.attack_power)
 
         # Обновление
         parameters.all_sprites.update()
@@ -160,7 +163,7 @@ def game():
         elif parameters.default_lvl == 2:
             screen.blit(second_background, (0, 0))
 
-        camera.update(player)  # центрируем камеру относительно персонажа
+        camera.update(Player)  # центрируем камеру относительно персонажа
         for s in parameters.all_sprites:
             screen.blit(s.image, camera.apply(s))
         pygame.display.flip()
@@ -180,14 +183,15 @@ def pause():
     while paused:
         pygame.display.set_caption("Paused")
         screen.blit(main_background, (0, 0))
-        screen.blit(pause_name, (350, 150))
+        screen.blit(paused_img, (250, 150))
         screen.blit(restart_name, (350, 100))
 
-        if pause_btn.draw(screen):
+        if resume_btn.draw(screen):
             parameters.select_sound.play()
             paused = False
-        elif exit_btn.draw(screen):
+        elif pause_exit_btn.draw(screen):
             parameters.moon_forest.stop()
+            parameters.village.stop()
             parameters.select_sound.play()
             paused = False
             delliting()
@@ -196,9 +200,34 @@ def pause():
         elif pygame.key.get_pressed()[pygame.K_r]:
             paused = False
             parameters.moon_forest.stop()
+            parameters.village.stop()
             delliting()
             parameters.all_sprites.empty()
             game()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        pygame.display.flip()
+
+
+def game_over():
+    running = True
+    while running:
+        pygame.display.set_caption("Game Over")
+        screen.fill(parameters.BLACK)
+        screen.blit(game_over_img, (250, 150))
+
+        if game_over_btn.draw(screen):
+            parameters.moon_forest.stop()
+            parameters.village.stop()
+            parameters.select_sound.play()
+            running = False
+            delliting()
+            parameters.all_sprites.empty()
+            main_menu()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -240,19 +269,19 @@ def select():
     while running:
         pygame.display.set_caption("Select Level")
         screen.blit(main_background, (0, 0))
-        if start_btn.draw(screen):
+        if first_btn.draw(screen):
             parameters.select_sound.play()
             parameters.default_lvl = 1
             running = False
             game()
             parameters.all_sprites.empty()
-        elif exit_btn.draw(screen):
+        elif second_btn.draw(screen):
             parameters.select_sound.play()
             parameters.default_lvl = 2
             parameters.based_j_power = 11
             parameters.based_attack_power = 4
             parameters.based_hp = 40
-            parameters.based_move_speed = 7
+            parameters.based_move_speed = 10.5
             running = False
             game()
             parameters.all_sprites.empty()
@@ -268,11 +297,16 @@ def select():
 def main_menu():
     running = True
     parameters.title.play(loops=100)
-    while running:
+    character_info = font1.render("C for Characteristics", True, parameters.RED)
+    pause_info = font1.render("ESC for Pause", True, parameters.RED)
 
+    while running:
         pygame.display.set_caption("Main Menu")
         screen.blit(main_background, (0, 0))
         screen.blit(name, (290, 200))
+        screen.blit(character_info, (550, 450))
+        screen.blit(pause_info, (550, 480))
+
         if start_btn.draw(screen):
             parameters.title.stop()
             parameters.select_sound.play()
@@ -285,7 +319,7 @@ def main_menu():
             running = False
             pygame.quit()
             quit()
-        elif first_btn.draw(screen):
+        elif select_btn.draw(screen):
             parameters.title.stop()
             parameters.select_sound.play()
             running = False
@@ -327,22 +361,35 @@ main_background = pygame.transform.scale(main_background, (parameters.WIDTH, par
 second_background = pygame.image.load('Backgrounds/second_background.png').convert_alpha()
 second_background = pygame.transform.scale(second_background, (parameters.WIDTH, parameters.HEIGHT))
 
-start_img = pygame.image.load("Buttons_Pictures/m_Start-Button.png").convert_alpha()
-start_btn = button.Button(x=300, y=250, image=start_img)
+# Для главного меню
+start_img = pygame.image.load("Buttons_Pictures/start_btn.png").convert_alpha()
+start_btn = button.Button(x=0, y=250, image=start_img)
+exit_img = pygame.image.load("Buttons_Pictures/exit_btn.png").convert_alpha()
+exit_btn = button.Button(x=0, y=450, image=exit_img)
+select_img = pygame.image.load("Buttons_Pictures/select_btn.png").convert_alpha()
+select_btn = button.Button(x=0, y=350, image=select_img)
 
-exit_img = pygame.image.load("Buttons_Pictures/m_Exit-Button.png").convert_alpha()
-exit_btn = button.Button(x=328, y=350, image=exit_img)
+# Для меню паузы
+resume_img = pygame.image.load("Buttons_Pictures/resume_btn.png").convert_alpha()
+resume_btn = button.Button(x=300, y=250, image=resume_img)
+pause_exit_img = pygame.image.load("Buttons_Pictures/exit_btn.png").convert_alpha()
+pause_exit_btn = button.Button(x=300, y=350, image=pause_exit_img)
+paused_img = pygame.image.load("Buttons_Pictures/paused.png").convert_alpha()
 
-pause_img = pygame.image.load("Buttons_Pictures/m_Pause-Button.png").convert_alpha()
-pause_btn = button.Button(x=300, y=250, image=pause_img)
+# Кнопки для меню выбора уровня
+first_img = pygame.image.load("Buttons_Pictures/first_btn.png").convert_alpha()
+first_btn = button.Button(x=300, y=200, image=first_img)
+second_img = pygame.image.load("Buttons_Pictures/second_btn.png").convert_alpha()
+second_btn = button.Button(x=300, y=300, image=second_img)
 
-first_img = pygame.image.load("Buttons_Pictures/frist.png").convert_alpha()
-first_btn = button.Button(x=300, y=450, image=first_img)
+# Для окончания игры
+game_over_img = pygame.image.load("Buttons_Pictures/game_over.png").convert_alpha()
+game_over_exit_img = pygame.image.load("Buttons_Pictures/exit_btn.png").convert_alpha()
+game_over_btn = button.Button(x=300, y=350, image=pause_exit_img)
 
 font = pygame.font.SysFont('serif', 48)
 font1 = pygame.font.SysFont('serif', 24)
 name = font.render("Time_Killer", True, parameters.RED)
-pause_name = font.render("Pause", True, parameters.RED)
 restart_name = font1.render("R for restart", True, parameters.RED)
 
 main_menu()
