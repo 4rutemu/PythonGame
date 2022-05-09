@@ -64,7 +64,7 @@ class Enemy(game_object.GameObject):
     def update(self):
         self.moving(pf=platform.platforms, stop_list=platform.stoppers)
 
-        if self.rect.y == self.player.rect.y and ((abs(self.rect.x - self.player.rect.x + self.player.rect.width) < parameters.ATTACK_WIDTH) or (
+        if (self.player.rect.y + 3 >= self.rect.y >= self.player.rect.y - 3) and ((abs(self.rect.x - self.player.rect.x + self.player.rect.width) < parameters.ATTACK_WIDTH) or (
                 abs(self.rect.x - self.player.rect.x - self.player.rect.width) < parameters.ATTACK_WIDTH)):
             if not self.attacked and random.randint(0, 4) == 3:  # немного глупости чтобы не был непобедимым
 
