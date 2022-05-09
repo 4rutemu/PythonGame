@@ -27,9 +27,12 @@ based_hp = 30
 based_move_speed = 4
 GRAVITY = 0.35
 based_j_power = 10
+
+right_attack_image = pygame.image.load("AnimationImages/attack-trail.png")
+left_attack_image = pygame.image.load("AnimationImages/attack-trail-left.png")
 ATTACK_TIME = 300
-ATTACK_WIDTH = 10
-ATTACK_HEIGHT = 30
+ATTACK_WIDTH = 13
+ATTACK_HEIGHT = 29
 based_attack_power = 1
 
 default_lvl = 1
