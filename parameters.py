@@ -30,6 +30,8 @@ based_j_power = 10
 
 right_attack_image = pygame.image.load("AnimationImages/attack-trail.png")
 left_attack_image = pygame.image.load("AnimationImages/attack-trail-left.png")
+enemy_attack_image = pygame.image.load("AnimationImages/Skeleton/attack_trail.png")
+left_enemy_attack_image = pygame.image.load("AnimationImages/Skeleton/attack_trail-left.png")
 ATTACK_TIME = 300
 ATTACK_WIDTH = 13
 ATTACK_HEIGHT = 29

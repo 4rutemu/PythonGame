@@ -17,7 +17,6 @@ class AttackSprite(game_object.GameObject):
                          colour=parameters.RED)
         self.creation_time = pygame.time.get_ticks()
 
-
     def update(self):
 
         if (pygame.time.get_ticks() - self.creation_time) > parameters.ATTACK_TIME:
@@ -45,8 +44,10 @@ class AttackSprite(game_object.GameObject):
         else:
             if self.player.rect.x >= e.enemies[self.owner].rect.x:
                 self.rect.x = e.enemies[self.owner].rect.x + e.enemies[self.owner].rect.width
+                self.image = parameters.enemy_attack_image
             elif self.player.rect.x <= e.enemies[self.owner].rect.x:
                 self.rect.x = e.enemies[self.owner].rect.x - parameters.ATTACK_WIDTH
+                self.image = parameters.left_enemy_attack_image
             self.rect.y = e.enemies[self.owner].rect.y
 
             if e.enemies[self.owner].is_attacking:

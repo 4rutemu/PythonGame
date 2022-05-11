@@ -7,6 +7,7 @@ import pygame
 import parameters
 import enemy
 import AttackSprite
+import animator
 
 
 class Player(game_object.GameObject):
@@ -49,14 +50,6 @@ class Player(game_object.GameObject):
         self.right_attack_image = pygame.image.load("AnimationImages/adventurer-attack2-03.png").convert_alpha()
         self.left_attack_image = pygame.image.load("AnimationImages/adventurer-attack2-03-left.png").convert_alpha()
 
-    def animation(self, animation_list, length):
-        if animation_list[0] >= length:
-            animation_list[0] = 1
-        self.image = animation_list[animation_list[0]]
-        animation_list[0] += 1
-
-    # TODO: Анимашки!!! Порезать картинки!!!
-
     def get_input(self, pf, enemies):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w] and self.onGround:
@@ -69,13 +62,13 @@ class Player(game_object.GameObject):
             self.dx = self.move_speed
             self.looking_right = True
             if self.onGround:
-                self.animation(self.right_run_images, len(self.right_run_images))
+                animator.animation(self, self.right_run_images, len(self.right_run_images))
 
         if keys[pygame.K_a]:
             self.dx = -self.move_speed
             self.looking_right = False
             if self.onGround:
-                self.animation(self.left_run_images, len(self.left_run_images))
+                animator.animation(self, self.left_run_images, len(self.left_run_images))
         if not (keys[pygame.K_d] or keys[pygame.K_a]):
             self.dx = 0
         if not self.onGround:
@@ -91,9 +84,9 @@ class Player(game_object.GameObject):
             self.is_attacking = True
         if not (keys[pygame.K_d] or keys[pygame.K_a] or keys[pygame.K_SPACE] or keys[pygame.K_w]) and self.onGround:
             if self.looking_right:
-                self.animation(self.right_idle_images, len(self.right_idle_images))
+                animator.animation(self, self.right_idle_images, len(self.right_idle_images))
             else:
-                self.animation(self.left_idle_images, len(self.left_idle_images))
+                animator.animation(self, self.left_idle_images, len(self.left_idle_images))
 
         self.onGround = False  # Неизвестно, когда он на земле
         self.rect.y += self.dy
