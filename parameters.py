@@ -23,7 +23,7 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
-based_hp = 30
+based_hp = 40
 based_move_speed = 4
 GRAVITY = 0.35
 based_j_power = 10

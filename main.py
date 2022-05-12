@@ -280,7 +280,7 @@ def select():
             parameters.default_lvl = 2
             parameters.based_j_power = 11
             parameters.based_attack_power = 4
-            parameters.based_hp = 40
+            parameters.based_hp = 50
             parameters.based_move_speed = 10.5
             running = False
             game()

@@ -4,7 +4,7 @@ import game_object
 
 
 PLATFORM_WIDTH = 30
-PLATFORM_HEIGHT = 30
+PLATFORM_HEIGHT = 32
 PLATFORM_COLOUR = (255, 255, 255)
 
 stoppers = []
