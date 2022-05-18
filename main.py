@@ -113,6 +113,7 @@ def game():
         clock.tick(parameters.FPS)
         if Player.kill_score == len(enemy.enemies):
             if parameters.level_status:
+                parameters.village.stop()
                 parameters.game_over_sound.play()
                 running = False
                 parameters.default_lvl = 1
